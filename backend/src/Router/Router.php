@@ -3,10 +3,11 @@
 namespace Src\Router;
 
 use Src\Controller\ProductsController;
+use Src\Controller\UsersController;
 
 class Router
 {
-    private $routes = ["products" => ProductsController::class];
+    private $routes = ["products" => ProductsController::class, "users" => UsersController::class];
 
     public function __construct(private $db)
     {

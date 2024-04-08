@@ -7,7 +7,7 @@ export const Route = createLazyFileRoute("/cart/")({
 function Index() {
   return (
     <main className="w-full md:w-10/12 flex flex-col gap-12 mx-auto">
-        
+      
     </main>
   );
 }

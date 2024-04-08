@@ -1,5 +1,5 @@
 import { Link, createLazyFileRoute } from "@tanstack/react-router";
-import axios from "axios";
+import ky from 'ky';
 
 import { Button } from "@components/ui/button";
 // eslint-disable-next-line import/named
@@ -14,8 +14,8 @@ export const Route = createLazyFileRoute("/")({
 function Index() {
   const fetchData = async () => {
     try {
-      const response = await axios.get("http://gered-store-back.lndo.site/products?limit=6");
-      return response.data;
+      const response: IProduct[] = await ky("http://gered-store-back.lndo.site/products?limit=6").json();
+      return response;
     } catch (error) {
       console.error("Error fetching data:", error);
       return [];

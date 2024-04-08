@@ -1,12 +1,13 @@
 import { Link } from "@tanstack/react-router";
-import { ShoppingCart, User } from "lucide-react";
-import axios from "axios";
+import { ShoppingCart } from "lucide-react";
+import ky from 'ky';
 import { useEffect, useState } from "react";
 
 import { Input } from "@shadcnUi/input";
 import { Button } from "@shadcnUi/button";
 import "./header.css";
 import { Skeleton } from "@shadcnUi/skeleton";
+import { ProfileButton } from "./profileButton";
 
 function SkeletonBrands() {
   return (
@@ -23,10 +24,11 @@ function SkeletonBrands() {
 }
 
 export const Header = () => {
+
   const fetchData = async () => {
     try {
-      const response = await axios.get("http://gered-store-back.lndo.site/products/brands?limit=7");
-      return response.data;
+      const response: string[] = await ky("http://gered-store-back.lndo.site/products/brands?limit=7").json();
+      return response;
     } catch (error) {
       console.error("Error fetching data:", error);
       return [];
@@ -97,12 +99,7 @@ export const Header = () => {
                   <ShoppingCart />
                 </Button>
               </Link>
-              <Link to="/">
-                <Button variant="ghost" className="h-full gap-4">
-                  Войти
-                  <User />
-                </Button>
-              </Link>
+              <ProfileButton rounded />
             </div>
           </nav>
         </div>
@@ -134,12 +131,7 @@ export const Header = () => {
                 <ShoppingCart />
               </Button>
             </Link>
-            <Link to="/">
-              <Button variant="ghost" className="h-full rounded-none gap-4">
-                Войти
-                <User />
-              </Button>
-            </Link>
+            <ProfileButton />
           </div>
         </div>
       </nav>

@@ -8,6 +8,8 @@ require APP_PATH . '/vendor/autoload.php';
 use Dotenv\Dotenv;
 use Src\Core\DatabaseConnector;
 
+require APP_PATH . '/src/Config/Constants.php';
+
 $dotenv = Dotenv::createImmutable(APP_PATH);
 $dotenv->load();
 $dbConnection = (new DatabaseConnector())->getConnection();
