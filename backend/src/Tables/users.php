@@ -20,7 +20,7 @@ class Users extends Table
     }
 
     public function findByEmail(string $email){
-        $sql = "SELECT id, firstname, lastname, password
+        $sql = "SELECT email, name, password
         FROM " . $this->t . "
         WHERE email = :email
         LIMIT 0,1";

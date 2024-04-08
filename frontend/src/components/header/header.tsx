@@ -9,6 +9,10 @@ import "./header.css";
 import { Skeleton } from "@shadcnUi/skeleton";
 import { ProfileButton } from "./profileButton";
 
+interface IBrand {
+  brand: string
+}
+
 function SkeletonBrands() {
   return (
     <>
@@ -27,7 +31,7 @@ export const Header = () => {
 
   const fetchData = async () => {
     try {
-      const response: string[] = await ky("http://gered-store-back.lndo.site/products/brands?limit=7").json();
+      const response: IBrand[] = await ky("http://gered-store-back.lndo.site/products/brands?limit=7").json();
       return response;
     } catch (error) {
       console.error("Error fetching data:", error);
@@ -35,7 +39,7 @@ export const Header = () => {
     }
   };
 
-  const [brands, setBrands] = useState<string[]>([]);
+  const [brands, setBrands] = useState<IBrand[]>([]);
 
   useEffect(() => {
     const fetchDataAsync = async () => {
@@ -115,12 +119,12 @@ export const Header = () => {
           {brands.length == 0 ? (
             <SkeletonBrands />
           ) : (
-            brands.map((brand) => (
+            brands.map(({ brand }) => (
               <Button
                 variant={"ghost"}
                 className="rounded-none text-gray-300 text-2xl py-7"
-                key={brand[0]}>
-                {brand[0]}
+                key={brand}>
+                {brand}
               </Button>
             ))
           )}

@@ -4,12 +4,12 @@ import { z } from "zod";
 import ky from "ky";
 import { Loader2 } from "lucide-react";
 import { useState, useTransition } from "react";
-import { useNavigate } from "@tanstack/react-router";
 
-import { DialogClose, DialogFooter, DialogHeader, DialogTitle } from "@shadcnUi/dialog";
+import { DialogHeader, DialogTitle } from "@shadcnUi/dialog";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@shadcnUi/form";
 import { Button } from "@shadcnUi/button";
 import { Input } from "@shadcnUi/input";
+import { useUserStore } from "@components/stores/UserStore";
 
 const formSchema = z.object({
   name: z
@@ -27,7 +27,6 @@ const formSchema = z.object({
 });
 
 export function RegForm() {
-  const navigate = useNavigate({ from: "/" });
   const [error, setError] = useState<string | undefined>();
   const [isPending, startTransition] = useTransition();
   const form = useForm<z.infer<typeof formSchema>>({
@@ -38,6 +37,7 @@ export function RegForm() {
       password: "",
     },
   });
+  const setUser = useUserStore((state) => state.setUser);
   const onSubmit = (values: z.infer<typeof formSchema>) => {
     startTransition(() => {
       console.log(values);
@@ -50,7 +50,8 @@ export function RegForm() {
             localStorage.setItem("jwt", response.jwt);
           }
           if (response.message) {
-            navigate({ to: "/cart" });
+            setUser();
+            setError(undefined);
           }
           if (response.error) {
             setError(response.error);
@@ -105,16 +106,12 @@ export function RegForm() {
             )}
           />
           {error && <p className="text-red-500">{error}</p>}
-        </form>
-      </Form>
-      <DialogFooter className="justify-center sm:justify-center">
-        <DialogClose>
           <Button onClick={() => form.handleSubmit(onSubmit)()} disabled={isPending}>
             {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
             Зарегистрироваться
           </Button>
-        </DialogClose>
-      </DialogFooter>
+        </form>
+      </Form>
     </>
   );
 }

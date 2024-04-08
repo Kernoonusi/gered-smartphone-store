@@ -1,13 +1,28 @@
-import { Link, createLazyFileRoute } from "@tanstack/react-router";
+import { Link, createFileRoute } from "@tanstack/react-router";
 import ky from 'ky';
 
 import { Button } from "@components/ui/button";
-// eslint-disable-next-line import/named
 import { ShoppingCart } from "lucide-react";
 import { useEffect, useState } from "react";
-import { IProduct } from "@/types";
+import { IProduct, IUser } from "@/types";
+import { useUserStore } from "@/components/stores/UserStore";
 
-export const Route = createLazyFileRoute("/")({
+export const Route = createFileRoute("/")({
+  loader: async () => {
+    if (localStorage.getItem("user")) {
+      const user = JSON.parse(localStorage.getItem("user") as string) as IUser;
+      useUserStore.setState({ user: user });
+    } else if (localStorage.getItem("jwt")) {
+      const user = await ky
+        .get("http://gered-store-back.lndo.site/users/me", {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("jwt")}`,
+          },
+        })
+        .json<IUser>();
+      useUserStore.setState({ user: user });
+    }
+  },
   component: Index,
 });
 

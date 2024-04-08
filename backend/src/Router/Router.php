@@ -14,11 +14,11 @@ class Router
         $this->db = $db;
     }
 
-    public function route(string $method, string $uri, array $formData = null)
+    public function route(string $method, string $uri, array $formData = null, array $headers = [])
     {
         $urls = explode("/", $uri);
         if (array_key_exists($urls[1], $this->routes)) {
-            $controller = new $this->routes[$urls[1]]($this->db, $method, $formData, $urls[array_key_last($urls)]);
+            $controller = new $this->routes[$urls[1]]($this->db, $method, $formData, $urls[array_key_last($urls)], $headers);
             $controller->processRequest();
         }
     }

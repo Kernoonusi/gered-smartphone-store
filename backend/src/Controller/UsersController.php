@@ -17,16 +17,19 @@ class UsersController
     // private int | null  $limit;
     private $routeActions = [
         'login' => 'login',
+        'me' => 'getUser',
     ];
     private array $formData;
+    private array $headers;
 
-    public function __construct(\PDO $db, string $requestMethod, array $formData = null, string $route = "")
+    public function __construct(\PDO $db, string $requestMethod, array $formData = null, string $route = "", array $headers = [])
     {
         $this->requestMethod = $requestMethod;
         $this->formData = $formData;
         $this->userId = $formData['id'] ?? null;
-        $this->limit = $formData['limit'] ?? null;
+        // $this->limit = $formData['limit'] ?? null;
         $this->route = $route;
+        $this->headers = $headers;
         $this->tableGateway = new Users($db);
     }
 
@@ -36,38 +39,62 @@ class UsersController
             case 'GET':
                 if ($this->route != "") {
                     if ($this->userId) {
-                        $response = $this->getUser($this->userId);
+                        $response = $this->getUserById($this->userId);
                     } else {
                         $response = call_user_func([$this, $this->routeActions[$this->route]]);
                     }
                 }
                 break;
             case 'POST':
-                $response = $this->createUserFromRequest();
+                if ($this->route != "") {
+                    if (array_key_exists($this->route, $this->routeActions)) {
+                        $response = $this->{$this->routeActions[$this->route]}();
+                    } else {
+                        $response = call_user_func([$this, $this->routeActions[$this->route]]);
+                    }
+                } else {
+                    $response = call_user_func([$this, $this->routeActions[$this->route]]);
+                }
                 break;
             case 'PUT':
                 $response = $this->updateUserFromRequest($this->userId);
                 break;
-            // case 'DELETE':
-            //     $response = $this->deleteProduct($this->productId);
-            //     break;
-            // default:
-            //     $response = $this->notFoundResponse();
-            //     break;
+                // case 'DELETE':
+                //     $response = $this->deleteProduct($this->productId);
+                //     break;
+                // default:
+                //     $response = $this->notFoundResponse();
+                //     break;
         }
-        header($response['status_code_header']);
-        if ($response['body']) {
+        http_response_code($response['status_code_header']);
+        if (isset($response['body'])) {
             echo $response['body'];
         }
     }
 
-    private function getUser($id)
+    private function getUserById($id)
     {
         $result = $this->tableGateway->find($id);
         if (!$result) {
             return $this->notFoundResponse();
         }
-        $response['status_code_header'] = 'HTTP/1.1 200 OK';
+        $response['status_code_header'] = 200;
+        $response['body'] = json_encode($result);
+        return $response;
+    }
+
+    private function getUser()
+    {
+        $decoded = $this->validateToken(str_split($this->headers['Authorization'])[2]);
+        var_dump($this->headers['Authorization'][2]);
+        if (!$decoded) {
+            return $this->unprocessableEntityResponse();
+        }
+        $result = $this->tableGateway->findByEmail($decoded['data']['email']);
+        if (!$result) {
+            return $this->notFoundResponse();
+        }
+        $response['status_code_header'] = 200;
         $response['body'] = json_encode($result);
         return $response;
     }
@@ -75,15 +102,12 @@ class UsersController
     private function login()
     {
         $input = json_decode(file_get_contents('php://input'), TRUE);
-        if (!$this->validateUser($input)) {
-            return $this->unprocessableEntityResponse();
-        }
         $result = $this->tableGateway->findByEmail($input['email']);
         if (!$result) {
             return $this->notFoundResponse();
         }
         if (!password_verify($input['password'], $result['password'])) {
-            return $this->unprocessableEntityResponse();
+            return $this->badRequestResponse('Неправильный пароль');
         }
         $key = "secret_key";
         $payload = [
@@ -94,7 +118,7 @@ class UsersController
             "data" => $result
         ];
         $jwt = JWT::encode($payload, $key, 'HS256');
-        $response['status_code_header'] = 'HTTP/1.1 200 OK';
+        $response['status_code_header'] = 200;
         $response['body'] = json_encode(
             array(
                 "message" => "Success login",
@@ -121,7 +145,7 @@ class UsersController
             "data" => $updatedUser
         ];
         $jwt = JWT::encode($payload, $key, 'HS256');
-        $response['status_code_header'] = 'HTTP/1.1 200 OK';
+        $response['status_code_header'] = 200;
         $response['body'] = json_encode(
             array(
                 "message" => "Success update user",
@@ -152,7 +176,7 @@ class UsersController
                 "jwt" => $jwt
             )
         );
-        $response['status_code_header'] = 'HTTP/1.1 201 Created';
+        $response['status_code_header'] = 201;
         $response['body'] = json_encode(
             array(
                 "message" => "Success create user",
@@ -187,18 +211,25 @@ class UsersController
         return true;
     }
 
+    private function badRequestResponse($error)
+    {
+        $response['status_code_header'] = 400;
+        $response['body'] = json_encode(['error' => $error]);
+        return $response;
+    }
+
     private function unprocessableEntityResponse()
     {
-        $response['status_code_header'] = 'HTTP/1.1 422 Unprocessable Entity';
+        $response['status_code_header'] = 422;
         $response['body'] = json_encode([
-            'error' => 'Invalid input'
+            'error' => 'Невалидный ввод'
         ]);
         return $response;
     }
 
     private function notFoundResponse()
     {
-        $response['status_code_header'] = 'HTTP/1.1 404 Not Found';
+        $response['status_code_header'] = 404;
         $response['body'] = null;
         return $response;
     }

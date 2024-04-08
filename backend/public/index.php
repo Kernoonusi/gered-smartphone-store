@@ -46,6 +46,7 @@ function getFormData($method)
 $requestMethod = $_SERVER["REQUEST_METHOD"];
 $formData = getFormData($requestMethod);
 $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+$headers = getallheaders();
 
 $router = new Router($dbConnection);
-$router->route($requestMethod, $uri, $formData);
+$router->route($requestMethod, $uri, $formData, $headers);

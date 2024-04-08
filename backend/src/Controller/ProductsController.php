@@ -17,7 +17,7 @@ class ProductsController
         'brands' => 'getBrands',
     ];
 
-    public function __construct(\PDO $db, string $requestMethod, array $formData = null, string $route = "")
+    public function __construct(\PDO $db, string $requestMethod, array $formData = null, string $route = "", array $headers = [])
     {
         $this->requestMethod = $requestMethod;
         $this->productId = $formData['id'] ?? null;

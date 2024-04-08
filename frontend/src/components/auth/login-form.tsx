@@ -2,11 +2,10 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { useState, useTransition } from "react";
-import ky from "ky";
+import ky, { HTTPError } from "ky";
 import { Loader2 } from "lucide-react";
-import { useNavigate } from "@tanstack/react-router";
 
-import { DialogClose, DialogFooter, DialogHeader, DialogTitle } from "@shadcnUi/dialog";
+import { DialogHeader, DialogTitle } from "@shadcnUi/dialog";
 import {
   Form,
   FormControl,
@@ -19,6 +18,7 @@ import {
 import { Button } from "@shadcnUi/button";
 import { Input } from "@shadcnUi/input";
 import { useAuthStore } from "@components/auth/auth-form";
+import { useUserStore } from "@components/stores/UserStore";
 
 const formSchema = z.object({
   email: z
@@ -32,7 +32,6 @@ const formSchema = z.object({
 });
 
 export function LoginForm() {
-  const navigate = useNavigate({ from: "/" });
   const [error, setError] = useState<string | undefined>();
   const [isPending, startTransition] = useTransition();
   const form = useForm<z.infer<typeof formSchema>>({
@@ -43,6 +42,7 @@ export function LoginForm() {
     },
   });
   const updateAuthState = useAuthStore((state) => state.updateState);
+  const setUser = useUserStore((state) => state.setUser);
   function onSubmit(values: z.infer<typeof formSchema>) {
     console.log(values);
     startTransition(() => {
@@ -55,10 +55,20 @@ export function LoginForm() {
             localStorage.setItem("jwt", response.jwt);
           }
           if (response.message) {
-            navigate({ to: "/cart" });
+            setUser();
+            setError(undefined);
           }
           if (response.error) {
             setError(response.error);
+          }
+        })
+        .catch((error) => {
+          if (typeof error !== "undefined") {
+            if (error instanceof HTTPError) {
+              error.response.json().then((data: { error?: string }) => setError(data.error));
+            } else {
+              console.log(error);
+            }
           }
         });
     });
@@ -105,16 +115,12 @@ export function LoginForm() {
             )}
           />
           {error && <p className="text-red-500">{error}</p>}
-        </form>
-      </Form>
-      <DialogFooter className="justify-center sm:justify-center">
-        <DialogClose>
-          <Button type="submit" onClick={() => form.handleSubmit(onSubmit)()} disabled={isPending}>
+          <Button type="submit" disabled={isPending}>
             {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
             Войти
           </Button>
-        </DialogClose>
-      </DialogFooter>
+        </form>
+      </Form>
     </>
   );
 }
