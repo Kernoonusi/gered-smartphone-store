@@ -9,10 +9,7 @@ import { useUserStore } from "@/components/stores/UserStore";
 
 export const Route = createFileRoute("/")({
   loader: async () => {
-    if (localStorage.getItem("user")) {
-      const user = JSON.parse(localStorage.getItem("user") as string) as IUser;
-      useUserStore.setState({ user: user });
-    } else if (localStorage.getItem("jwt")) {
+    if (useUserStore.getState().user.name === "" && localStorage.getItem("jwt")) {
       const user = await ky
         .get("http://gered-store-back.lndo.site/users/me", {
           headers: {

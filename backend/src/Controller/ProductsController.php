@@ -2,28 +2,48 @@
 
 namespace Src\Controller;
 
+use Src\Core\Controller;
 use Src\Tables\Products;
 
-class ProductsController
+class ProductsController extends Controller
 {
-    private $requestMethod;
-    private int | null $productId;
-    private $productGateway;
-    private string $route;
-    private int | null  $limit;
-    private $routeActions = [
-        'products' => 'getAllProducts',
-        'new' => 'getNewProducts',
-        'brands' => 'getBrands',
-    ];
+    private Products $tableGateway;
+    private int|null $productId;
+    private $limit;
 
     public function __construct(\PDO $db, string $requestMethod, array $formData = null, string $route = "", array $headers = [])
     {
-        $this->requestMethod = $requestMethod;
+        parent::__construct(
+            $db,
+            $requestMethod,
+            $formData,
+            $route,
+            $headers,
+            [
+                'nameProduct',
+                'price',
+                'description',
+                'ram',
+                'storage',
+                'soc',
+                'weight',
+                'size',
+                'brand',
+                'releaseYear',
+                'count'
+            ],
+            [
+                'create' => 'createProductFromRequest',
+                'update' => 'updateProductFromRequest',
+                'delete' => 'deleteProduct',
+                'products' => 'getAllProducts',
+                'new' => 'getNewProducts',
+                'brands' => 'getBrands',
+            ]
+        );
         $this->productId = $formData['id'] ?? null;
         $this->limit = $formData['limit'] ?? null;
-        $this->route = $route;
-        $this->productGateway = new Products($db);
+        $this->tableGateway = new Products($db);
     }
 
     public function processRequest()
@@ -55,43 +75,43 @@ class ProductsController
                 $response = $this->notFoundResponse();
                 break;
         }
-        header($response['status_code_header']);
-        if ($response['body']) {
+        http_response_code($response['status_code_header']);
+        if (isset($response['body'])) {
             echo $response['body'];
         }
     }
 
     private function getAllProducts()
     {
-        $result = $this->productGateway->findAll($this->limit);
-        $response['status_code_header'] = 'HTTP/1.1 200 OK';
+        $result = $this->tableGateway->findAll($this->limit);
+        $response['status_code_header'] = 200;
         $response['body'] = json_encode($result);
         return $response;
     }
 
     private function getBrands()
     {
-        $result = $this->productGateway->findAllBrands($this->limit);
-        $response['status_code_header'] = 'HTTP/1.1 200 OK';
+        $result = $this->tableGateway->findAllBrands($this->limit);
+        $response['status_code_header'] = 200;
         $response['body'] = json_encode($result);
         return $response;
     }
 
     private function getProduct($id)
     {
-        $result = $this->productGateway->find($id);
+        $result = $this->tableGateway->find($id);
         if (!$result) {
             return $this->notFoundResponse();
         }
-        $response['status_code_header'] = 'HTTP/1.1 200 OK';
+        $response['status_code_header'] = 200;
         $response['body'] = json_encode($result);
         return $response;
     }
 
     private function getNewProducts()
     {
-        $result = $this->productGateway->findAllNew($this->limit);
-        $response['status_code_header'] = 'HTTP/1.1 200 OK';
+        $result = $this->tableGateway->findAllNew($this->limit);
+        $response['status_code_header'] = 200;
         $response['body'] = json_encode($result);
         return $response;
     }
@@ -99,66 +119,39 @@ class ProductsController
     private function createProductFromRequest()
     {
         $input = (array) json_decode(file_get_contents('php://input'), TRUE);
-        if (!$this->validateProduct($input)) {
+        if (!$this->validate($input)) {
             return $this->unprocessableEntityResponse();
         }
-        $this->productGateway->insert($input);
-        $response['status_code_header'] = 'HTTP/1.1 201 Created';
+        $this->tableGateway->insert($input);
+        $response['status_code_header'] = 201;
         $response['body'] = null;
         return $response;
     }
 
     private function updateProductFromRequest($id)
     {
-        $result = $this->productGateway->find($id);
+        $result = $this->tableGateway->find($id);
         if (!$result) {
             return $this->notFoundResponse();
         }
         $input = (array) json_decode(file_get_contents('php://input'), TRUE);
-        if (!$this->validateProduct($input)) {
+        if (!$this->validate($input)) {
             return $this->unprocessableEntityResponse();
         }
-        $this->productGateway->update($id, $input);
-        $response['status_code_header'] = 'HTTP/1.1 200 OK';
+        $this->tableGateway->update($id, $input);
+        $response['status_code_header'] = 200;
         $response['body'] = null;
         return $response;
     }
 
     private function deleteProduct($id)
     {
-        $result = $this->productGateway->find($id);
+        $result = $this->tableGateway->find($id);
         if (!$result) {
             return $this->notFoundResponse();
         }
-        $this->productGateway->delete($id);
-        $response['status_code_header'] = 'HTTP/1.1 200 OK';
-        $response['body'] = null;
-        return $response;
-    }
-
-    private function validateProduct($input)
-    {
-        if (!isset($input['firstname'])) {
-            return false;
-        }
-        if (!isset($input['lastname'])) {
-            return false;
-        }
-        return true;
-    }
-
-    private function unprocessableEntityResponse()
-    {
-        $response['status_code_header'] = 'HTTP/1.1 422 Unprocessable Entity';
-        $response['body'] = json_encode([
-            'error' => 'Invalid input'
-        ]);
-        return $response;
-    }
-
-    private function notFoundResponse()
-    {
-        $response['status_code_header'] = 'HTTP/1.1 404 Not Found';
+        $this->tableGateway->delete($id);
+        $response['status_code_header'] = 200;
         $response['body'] = null;
         return $response;
     }

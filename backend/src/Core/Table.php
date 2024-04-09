@@ -19,7 +19,7 @@ class Table
         }
     }
 
-    public function fetchOne(string $query, array $params = []): array
+    public function fetchOne(string $query, array $params = [])
     {
         try {
             $stmt = $this->db->prepare($query);

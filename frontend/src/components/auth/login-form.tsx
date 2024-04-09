@@ -19,6 +19,7 @@ import { Button } from "@shadcnUi/button";
 import { Input } from "@shadcnUi/input";
 import { useAuthStore } from "@components/auth/auth-form";
 import { useUserStore } from "@components/stores/UserStore";
+import { useToast } from "@shadcnUi/use-toast";
 
 const formSchema = z.object({
   email: z
@@ -41,6 +42,7 @@ export function LoginForm() {
       password: "",
     },
   });
+  const { toast } = useToast();
   const updateAuthState = useAuthStore((state) => state.updateState);
   const setUser = useUserStore((state) => state.setUser);
   function onSubmit(values: z.infer<typeof formSchema>) {
@@ -56,6 +58,10 @@ export function LoginForm() {
           }
           if (response.message) {
             setUser();
+            toast({
+              title: "Успешный вход",
+              description: response.message,
+            });
             setError(undefined);
           }
           if (response.error) {

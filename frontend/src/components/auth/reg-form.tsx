@@ -10,6 +10,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Button } from "@shadcnUi/button";
 import { Input } from "@shadcnUi/input";
 import { useUserStore } from "@components/stores/UserStore";
+import { useToast } from "@shadcnUi/use-toast";
 
 const formSchema = z.object({
   name: z
@@ -38,10 +39,11 @@ export function RegForm() {
     },
   });
   const setUser = useUserStore((state) => state.setUser);
+  const { toast } = useToast();
   const onSubmit = (values: z.infer<typeof formSchema>) => {
     startTransition(() => {
       console.log(values);
-      ky.post("http://gered-store-back.lndo.site/users", {
+      ky.post("http://gered-store-back.lndo.site/users/create", {
         json: values,
       })
         .json<{ message?: string; jwt?: string; error?: string }>()
@@ -51,6 +53,10 @@ export function RegForm() {
           }
           if (response.message) {
             setUser();
+            toast({
+              title: "Успешная регистрация!",
+              description: response.message,
+            });
             setError(undefined);
           }
           if (response.error) {

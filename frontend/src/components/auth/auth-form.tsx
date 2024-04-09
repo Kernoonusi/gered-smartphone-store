@@ -1,5 +1,5 @@
 // import { useState } from "react";
-import { create } from 'zustand'
+import { create } from "zustand";
 
 import { DialogContent } from "@shadcnUi/dialog";
 import { LoginForm } from "@components/auth/login-form";
@@ -13,17 +13,17 @@ const authStates = new Map<string, JSX.Element>([
 ]);
 
 type State = {
-  authState: string
-}
+  authState: string;
+};
 
 type Action = {
-  updateState: (authState: State['authState']) => void
-}
+  updateState: (authState: State["authState"]) => void;
+};
 
 export const useAuthStore = create<State & Action>((set) => ({
   authState: "login",
   updateState: (newState: string) => set(() => ({ authState: newState })),
-}))
+}));
 
 export function AuthForm() {
   const authState = useAuthStore((state) => state.authState);
