@@ -6,7 +6,7 @@ import { AuthForm } from "@components/auth/auth-form";
 import { useUserStore } from "@components/stores/UserStore";
 
 export function ProfileButton({ rounded }: { rounded?: boolean }) {
-  const user = useUserStore((state) => state.user);
+  const user = useUserStore((state) => state);
   return (
     <>
       {user.email !== "" ? (

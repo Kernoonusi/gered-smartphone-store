@@ -2,17 +2,15 @@ import { ICartItem, IUser } from "@/types";
 import ky, { HTTPError } from "ky";
 import { create } from "zustand";
 
-interface UserState {
-  user: IUser;
+type UserStateAction = {
   setUser: () => void;
   updateCart: (cart: ICartItem[]) => void;
-}
+  addItemToCart: (product: ICartItem) => void;
+};
 
-export const useUserStore = create<UserState>((set) => ({
-  user: {
-    name: "",
-    email: "",
-  },
+export const useUserStore = create<IUser & UserStateAction>((set) => ({
+  name: "",
+  email: "",
   setUser: async () => {
     const user = await ky
       .get("http://gered-store-back.lndo.site/users/me", {
@@ -36,19 +34,13 @@ export const useUserStore = create<UserState>((set) => ({
         }
       });
     if (user) {
-      set({ user });
+      set(user);
     }
   },
-  updateCart: (cart: ICartItem[]) => set(state => ({...state, user: {...state.user, cart}})),
-  addItemToCart: (product: ICartItem) => set((state) => {
-    if(state.user.cart === undefined) {
-      return {
-        user: { ...state.user, cart: [product] }
-      };
-    }
-    const newCart = [...state.user.cart, product];
-    return {
-      user: { ...state.user, cart: newCart }
-    };
-  }),
+  updateCart: (cart: ICartItem[]) => set((state) => ({ ...state, cart })),
+  addItemToCart: (product: ICartItem) =>
+    set((state) => {
+      const newCart = state.cart ? [...state.cart, product] : [product];
+      return { ...state, cart: newCart };
+    }),
 }));

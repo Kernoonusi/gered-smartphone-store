@@ -1,3 +1,4 @@
+import { useUserStore } from "@/components/stores/UserStore";
 import { kyApi } from "@/lib/ky";
 import { ICartItem, IProduct } from "@/types";
 
@@ -14,6 +15,10 @@ export const cartService = {
     return response;
   },
   addToCart: async (product: IProduct) => {
+    const newCartItem: ICartItem = {
+      ...product,
+      countBasket: 1,
+    };
     await kyApi
       .post("cart/add", {
         json: { product_id: product.id, countBasket: 1 },
@@ -25,9 +30,30 @@ export const cartService = {
       .then(() => {
         if (localStorage.getItem("cart") !== null) {
           const prev: ICartItem[] = JSON.parse(localStorage.getItem("cart")!);
-          localStorage.setItem("cart", JSON.stringify([...prev, product]));
+          localStorage.setItem("cart", JSON.stringify([...prev, newCartItem]));
         } else {
-          localStorage.setItem("cart", JSON.stringify([product]));
+          localStorage.setItem("cart", JSON.stringify([newCartItem]));
+        }
+        useUserStore.getState().addItemToCart(newCartItem);
+      });
+  },
+  removeFromCart: async (product: ICartItem) => {
+    await kyApi
+      .post("cart/remove", {
+        json: { product_id: product.id },
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("jwt")}`,
+        },
+      })
+      .json()
+      .then(() => {
+        if (localStorage.getItem("cart") !== null) {
+          const prev: ICartItem[] = JSON.parse(localStorage.getItem("cart")!);
+          localStorage.setItem(
+            "cart",
+            JSON.stringify(prev.filter((item) => item.id !== product.id)),
+          );
+          useUserStore.getState().updateCart(JSON.parse(localStorage.getItem("cart")!));
         }
       });
   },

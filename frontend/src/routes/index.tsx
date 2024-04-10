@@ -9,7 +9,7 @@ import { ProductCard } from "@/components/productCard";
 
 export const Route = createFileRoute("/")({
   loader: async () => {
-    if (useUserStore.getState().user.name === "" && localStorage.getItem("jwt")) {
+    if (useUserStore.getState().name === "" && localStorage.getItem("jwt")) {
       const user = await ky
         .get("http://gered-store-back.lndo.site/users/me", {
           headers: {
@@ -17,7 +17,7 @@ export const Route = createFileRoute("/")({
           },
         })
         .json<IUser>();
-      useUserStore.setState({ user: user });
+      useUserStore.setState(user);
     }
   },
   component: Index,

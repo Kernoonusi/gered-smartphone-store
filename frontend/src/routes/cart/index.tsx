@@ -1,26 +1,15 @@
 import { ProductCard } from "@/components/productCard";
 import { useUserStore } from "@/components/stores/UserStore";
 import { Button } from "@/components/ui/button";
-import { kyApi } from "@/lib/ky";
 import { cartService } from "@/services/cart.service";
 import { productsService } from "@/services/products.service";
-import { ICartItem, IUser } from "@/types";
+import { ICartItem } from "@/types";
 import { Await, createFileRoute, defer } from "@tanstack/react-router";
 import { Trash } from "lucide-react";
 import { Suspense } from "react";
 
 export const Route = createFileRoute("/cart/")({
   loader: async () => {
-    if (useUserStore.getState().user.name === "" && localStorage.getItem("jwt")) {
-      const user = await kyApi
-        .get("users/me", {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("jwt")}`,
-          },
-        })
-        .json<IUser>();
-      useUserStore.setState({ user: user });
-    }
     if (!localStorage.getItem("cart") && localStorage.getItem("jwt")) {
       const cart: ICartItem[] = await cartService.getCart();
       useUserStore.getState().updateCart(cart);
@@ -28,7 +17,6 @@ export const Route = createFileRoute("/cart/")({
     if (localStorage.getItem("cart") !== null) {
       const cart: ICartItem[] = JSON.parse(localStorage.getItem("cart")!);
       useUserStore.getState().updateCart(cart);
-      console.log(useUserStore.getState().user.cart);
     }
     const data = productsService.getProducts();
     return {
@@ -40,17 +28,17 @@ export const Route = createFileRoute("/cart/")({
 
 function Index() {
   const { products } = Route.useLoaderData();
-  const cart = useUserStore((state) => state.user.cart);
+  const cart = useUserStore((state) => state.cart);
   return (
     <main className="w-full md:w-10/12 mt-6 flex flex-col gap-12 mx-auto">
-      {!cart ? null : (
+      {cart === undefined ? null : (
         <div className="flex gap-4 items-end">
           <h2 className="text-3xl font-semibold">Корзина</h2>
-          <p className="text-zinc-500">{cart.reduce((acc, item) => acc + item.countBasket,0) + " товар(ов), " + cart.reduce((acc, item) => +acc + +item.price, 0)}₽</p>
+          <p className="text-zinc-500">{cart.reduce((acc, item) => acc + item.countBasket, 0) + " товар(ов), " + cart.reduce((acc, item) => +acc + +item.price, 0)}₽</p>
         </div>
       )}
       <article className="flex flex-col gap-4">
-        {!cart ? (
+        {cart === undefined ? (
           <p className="text-3xl">Ваша корзина пока пуста</p>
         ) : (
           cart.map((item) => (
@@ -60,7 +48,7 @@ function Index() {
                 {item.brand} {item.nameProduct}
               </p>
               <p className="row-span-3 text-center m-auto">{item.countBasket}</p>
-              <Button type="button" variant={"ghost"} size={"icon"} className="row-span-3 m-auto flex justify-center items-center text-gray-500">
+              <Button type="button" variant={"ghost"} size={"icon"} onClick={() => cartService.removeFromCart(item)} className="row-span-3 m-auto flex justify-center items-center text-gray-500">
                 <Trash/>
               </Button>
               <p className="row-span-1">{item.price}₽</p>

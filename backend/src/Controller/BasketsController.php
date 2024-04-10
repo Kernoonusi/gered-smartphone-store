@@ -34,7 +34,7 @@ class BasketsController extends Controller
             ],
             [
                 'add' => 'addProductToBasket',
-                'delete' => 'deleteProductFromBasket',
+                'remove' => 'removeProductFromBasket',
                 'me' => 'getUserBasket',
             ]
         );
@@ -72,7 +72,7 @@ class BasketsController extends Controller
         }
     }
 
-    public function getUserBasket()
+    private function getUserBasket()
     {
         $token = explode(' ', $this->headers['Authorization'])[1];
         $decoded = $this->validateToken($token);
@@ -91,7 +91,33 @@ class BasketsController extends Controller
         return $response;
     }
 
-    public function addProductToBasket()
+    private function removeProductFromBasket()
+    {
+        $token = explode(' ', $this->headers['Authorization'])[1];
+        $decoded = $this->validateToken($token);
+        if (!$decoded) {
+            return $this->unprocessableEntityResponse();
+        }
+        $user = $this->tableGatewayUsers->findByEmail($decoded['data']->email);
+        if (!$user) {
+            return $this->notFoundResponse();
+        }
+        $input = (array) json_decode(file_get_contents('php://input'), TRUE);
+        $product = [
+            "user_id" => $user['id'],
+            "product_id" => $input['product_id']
+        ];
+        $this->tableGateway->remove($product['user_id'], $product['product_id']);
+        $response['status_code_header'] = 200;
+        $response['body'] = json_encode(
+            array(
+                "message" => "Продукт удален из корзины",
+            )
+        );
+        return $response;
+    }
+
+    private function addProductToBasket()
     {
         $token = explode(' ', $this->headers['Authorization'])[1];
         $decoded = $this->validateToken($token);
