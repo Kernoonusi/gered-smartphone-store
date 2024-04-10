@@ -47,7 +47,7 @@ class UsersController extends Controller
                 break;
             case 'POST':
                 if ($this->route != "") {
-                    $response = $this->{$this->routeActions[$this->route]}();
+                    $response = call_user_func([$this, $this->routeActions[$this->route]]);
                 }
                 break;
             // case 'PUT':
@@ -149,7 +149,7 @@ class UsersController extends Controller
         $response['status_code_header'] = 201;
         $response['body'] = json_encode(
             array(
-                "message" => "Success create user",
+                "message" => "Успешное создание пользователя",
                 "jwt" => $jwt
             )
         );

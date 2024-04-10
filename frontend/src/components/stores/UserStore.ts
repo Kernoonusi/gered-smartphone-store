@@ -1,11 +1,11 @@
-import { IProduct, IUser } from "@/types";
+import { ICartItem, IUser } from "@/types";
 import ky, { HTTPError } from "ky";
 import { create } from "zustand";
 
 interface UserState {
   user: IUser;
   setUser: () => void;
-  updateCart: (cart: IProduct[]) => void;
+  updateCart: (cart: ICartItem[]) => void;
 }
 
 export const useUserStore = create<UserState>((set) => ({
@@ -39,5 +39,16 @@ export const useUserStore = create<UserState>((set) => ({
       set({ user });
     }
   },
-  updateCart: (cart: IProduct[]) => set((state) => ({ ...state, cart })),
+  updateCart: (cart: ICartItem[]) => set(state => ({...state, user: {...state.user, cart}})),
+  addItemToCart: (product: ICartItem) => set((state) => {
+    if(state.user.cart === undefined) {
+      return {
+        user: { ...state.user, cart: [product] }
+      };
+    }
+    const newCart = [...state.user.cart, product];
+    return {
+      user: { ...state.user, cart: newCart }
+    };
+  }),
 }));

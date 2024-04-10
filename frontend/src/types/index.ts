@@ -1,4 +1,5 @@
 export interface IProduct {
+    id: number;
     nameProduct: string;
     price: number;
     description: string;
@@ -11,8 +12,12 @@ export interface IProduct {
     count: number;
 }
 
+export interface ICartItem extends IProduct {
+    countBasket: number;
+}
+
 export interface IUser {
     name: string;
     email: string;
-    cart?: IProduct[]
+    cart?: ICartItem[]
 }

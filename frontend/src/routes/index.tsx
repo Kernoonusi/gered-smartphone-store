@@ -1,11 +1,11 @@
 import { Link, createFileRoute } from "@tanstack/react-router";
-import ky from 'ky';
+import ky from "ky";
 
 import { Button } from "@components/ui/button";
-import { ShoppingCart } from "lucide-react";
 import { useEffect, useState } from "react";
 import { IProduct, IUser } from "@/types";
 import { useUserStore } from "@/components/stores/UserStore";
+import { ProductCard } from "@/components/productCard";
 
 export const Route = createFileRoute("/")({
   loader: async () => {
@@ -26,7 +26,9 @@ export const Route = createFileRoute("/")({
 function Index() {
   const fetchData = async () => {
     try {
-      const response: IProduct[] = await ky("http://gered-store-back.lndo.site/products?limit=6").json();
+      const response: IProduct[] = await ky(
+        "http://gered-store-back.lndo.site/products?limit=5",
+      ).json();
       return response;
     } catch (error) {
       console.error("Error fetching data:", error);
@@ -62,22 +64,9 @@ function Index() {
         <Link to="/" className="after:content-['->']">
           Все новинки
         </Link>
-        <div className="w-full col-span-3 row-span-1 grid grid-cols-6 gap-4">
-          {data.map(({ nameProduct: name, brand, price}, index) => (
-            <article
-              className="grid grid-cols-2 grid-rows-[auto_auto_auto] gap-4 items-center"
-              key={index}>
-              <img src={"xiaomiTel.jpg"} alt={""} className="col-span-2" />
-              <Link to="/" className="col-span-2 capitalize text-xl">
-                {brand + " " + name}
-              </Link>
-              <p className="flex items-center text-xl">
-                {price} ₽{" "}
-              </p>
-              <Button variant={"ghost"} className="w-fit justify-self-end rounded-full">
-                <ShoppingCart />
-              </Button>
-            </article>
+        <div className="w-full col-span-3 row-span-1 grid grid-cols-5 gap-4">
+          {data.map((item) => (
+            <ProductCard key={item.id} item={item} />
           ))}
         </div>
       </article>
@@ -87,22 +76,9 @@ function Index() {
         <Link to="/" className="after:content-['->']">
           Все товары
         </Link>
-        <div className="w-full col-span-3 row-span-1 grid grid-cols-6 gap-4">
-          {data.map(({ nameProduct: name, brand, price}, index) => (
-            <article
-              className="grid grid-cols-2 grid-rows-[auto_auto_auto] gap-4 items-center"
-              key={index}>
-              <img src={"xiaomiTel.jpg"} alt={""} className="col-span-2" />
-              <Link to="/" className="col-span-2 capitalize text-xl">
-                {brand + " " + name}
-              </Link>
-              <p className="flex items-center text-xl">
-                {price} ₽{" "}
-              </p>
-              <Button variant={"ghost"} className="w-fit justify-self-end rounded-full">
-                <ShoppingCart />
-              </Button>
-            </article>
+        <div className="w-full col-span-3 row-span-1 grid grid-cols-5 gap-4">
+          {data.map((item) => (
+            <ProductCard key={item.id} item={item} />
           ))}
         </div>
       </article>
