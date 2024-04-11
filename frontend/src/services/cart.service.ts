@@ -57,4 +57,24 @@ export const cartService = {
         }
       });
   },
+  increaseCountBasket: async (product: ICartItem) => {
+    if (localStorage.getItem("cart") !== null) {
+      const prev: ICartItem[] = JSON.parse(localStorage.getItem("cart")!);
+      prev[prev.findIndex((item) => item.id === product.id)].countBasket++;
+      localStorage.setItem("cart", JSON.stringify(prev));
+      useUserStore.getState().updateCart(JSON.parse(localStorage.getItem("cart")!));
+    }
+  },
+  decreaseCountBasket: async (product: ICartItem) => {
+    if (localStorage.getItem("cart") !== null) {
+      const prev: ICartItem[] = JSON.parse(localStorage.getItem("cart")!);
+      prev[prev.findIndex((item) => item.id === product.id)].countBasket--;
+      if (prev[prev.findIndex((item) => item.id === product.id)].countBasket <= 0) {
+        cartService.removeFromCart(product);
+      } else {
+        localStorage.setItem("cart", JSON.stringify(prev));
+        useUserStore.getState().updateCart(JSON.parse(localStorage.getItem("cart")!));
+      }
+    }
+  },
 };

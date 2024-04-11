@@ -17,8 +17,8 @@ export function ProductCard({ item }: { item: IProduct }) {
         </Link>
       </CardHeader>
       <CardContent>
-        <Link to={`/`}>
-          <p>{item.brand} {item.nameProduct}</p>
+        <Link to={`/products/$productId`} params={{ productId: item.id.toString() }}>
+          <p>Смартфон {item.brand} {item.nameProduct} {item.ram}гб + {item.storage}гб</p>
         </Link>
       </CardContent>
       <CardFooter className="flex justify-between">

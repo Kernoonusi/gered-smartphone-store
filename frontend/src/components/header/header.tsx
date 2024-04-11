@@ -1,6 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import { ShoppingCart } from "lucide-react";
-import ky from 'ky';
+import ky from "ky";
 import { useEffect, useState } from "react";
 
 import { Input } from "@shadcnUi/input";
@@ -10,7 +10,7 @@ import { Skeleton } from "@shadcnUi/skeleton";
 import { ProfileButton } from "./profileButton";
 
 interface IBrand {
-  brand: string
+  brand: string;
 }
 
 function SkeletonBrands() {
@@ -28,10 +28,11 @@ function SkeletonBrands() {
 }
 
 export const Header = () => {
-
   const fetchData = async () => {
     try {
-      const response: IBrand[] = await ky("http://gered-store-back.lndo.site/products/brands?limit=7").json();
+      const response: IBrand[] = await ky(
+        "http://gered-store-back.lndo.site/products/brands?limit=7",
+      ).json();
       return response;
     } catch (error) {
       console.error("Error fetching data:", error);
@@ -113,9 +114,11 @@ export const Header = () => {
           <Link to="/" className="anim-elem w-fit transition-all text-3xl p-2 h-full text-cyan-300">
             G
           </Link>
-          <Button variant={"ghost"} className="rounded-none text-white text-2xl py-7 mr-10">
-            Все смартфоны
-          </Button>
+          <Link to="/products">
+            <Button variant={"ghost"} className="rounded-none text-white text-2xl py-7 mr-10">
+              Все смартфоны
+            </Button>
+          </Link>
           {brands.length == 0 ? (
             <SkeletonBrands />
           ) : (

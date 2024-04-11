@@ -5,7 +5,7 @@ import { cartService } from "@/services/cart.service";
 import { productsService } from "@/services/products.service";
 import { ICartItem } from "@/types";
 import { Await, createFileRoute, defer } from "@tanstack/react-router";
-import { Trash } from "lucide-react";
+import { Minus, Plus, Trash } from "lucide-react";
 import { Suspense } from "react";
 
 export const Route = createFileRoute("/cart/")({
@@ -34,7 +34,14 @@ function Index() {
       {cart === undefined ? null : (
         <div className="flex gap-4 items-end">
           <h2 className="text-3xl font-semibold">Корзина</h2>
-          <p className="text-zinc-500">{cart.reduce((acc, item) => acc + item.countBasket, 0) + " товар(ов), " + cart.reduce((acc, item) => +acc + +item.price, 0)}₽</p>
+          <p className="text-zinc-500">
+            {cart?.reduce((acc, item) => acc + item.countBasket, 0) || 0} товар(ов),{" "}
+            {cart?.reduce(
+              (acc, item) => acc + +(item.price * item.countBasket).toFixed(2),
+              0,
+            ) || 0}
+            ₽
+          </p>
         </div>
       )}
       <article className="flex flex-col gap-4">
@@ -47,9 +54,32 @@ function Index() {
               <p className="row-span-1">
                 {item.brand} {item.nameProduct}
               </p>
-              <p className="row-span-3 text-center m-auto">{item.countBasket}</p>
-              <Button type="button" variant={"ghost"} size={"icon"} onClick={() => cartService.removeFromCart(item)} className="row-span-3 m-auto flex justify-center items-center text-gray-500">
-                <Trash/>
+              <div className="row-span-3 flex justify-center items-center m-auto gap-2">
+                <Button
+                  type="button"
+                  variant={"ghost"}
+                  size={"icon"}
+                  onClick={() => cartService.increaseCountBasket(item)}
+                  className="text-green-500">
+                  <Plus />
+                </Button>
+                <p className="text-center">{item.countBasket}</p>
+                <Button
+                  type="button"
+                  variant={"ghost"}
+                  size={"icon"}
+                  onClick={() => cartService.decreaseCountBasket(item)}
+                  className="text-red-500">
+                  <Minus />
+                </Button>
+              </div>
+              <Button
+                type="button"
+                variant={"ghost"}
+                size={"icon"}
+                onClick={() => cartService.removeFromCart(item)}
+                className="row-span-3 m-auto flex justify-center items-center text-gray-500">
+                <Trash />
               </Button>
               <p className="row-span-1">{item.price}₽</p>
             </div>
