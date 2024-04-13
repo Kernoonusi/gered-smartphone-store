@@ -10,9 +10,9 @@ export function ProductCard({ item }: { item: IProduct }) {
     cartService.addToCart(item);
   };
   return (
-    <Card>
+    <Card className="flex flex-col justify-between">
       <CardHeader>
-        <Link to={`/`}>
+        <Link to={`/products/$productId`} params={{ productId: item.id.toString() }}>
           <img src="xiaomiTel.jpg" alt="" />
         </Link>
       </CardHeader>

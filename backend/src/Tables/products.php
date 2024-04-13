@@ -13,34 +13,75 @@ class Products extends Table
         parent::__construct($db);
     }
 
-    public function findAll($limit)
+    public function findAll($limit = 0)
     {
         $sql = "SELECT * FROM $this->t ORDER BY id ASC";
-        if($limit > 0){
+        if ($limit > 0) {
             $sql .= " LIMIT $limit";
         }
         return $this->fetchAll($sql);
     }
 
-    public function findAllNew($limit){
+    public function findAllNew($limit)
+    {
         $sql = "SELECT * FROM $this->t ORDER BY releaseYear DESC";
-        if($limit > 0){
+        if ($limit > 0) {
             $sql .= " LIMIT $limit";
         }
         return $this->fetchAll($sql);
     }
 
-    public function findAllBrands($limit){
+    public function findAllBrands($limit = 0)
+    {
         $sql = "SELECT brand FROM $this->t group by brand";
-        if($limit > 0){
+        if ($limit > 0) {
             $sql .= " LIMIT $limit";
         }
         return $this->fetchAll($sql);
+    }
+
+    public function findProductsWithFilters($filters, $filter_params, $limit = 0)
+    {
+        $sql = "SELECT * FROM $this->t";
+        if (!empty($filters)) {
+            $sql .= " WHERE ";
+            $sql .= implode(" AND ", $filters);
+        }
+        $sql = rtrim($sql, " AND ");
+        if ($limit > 0) {
+            $sql .= " LIMIT $limit";
+        }
+        // var_dump($sql);
+        return $this->fetchAll($sql, [
+            'minPrice' => $filter_params['minPrice'],
+            'maxPrice' => $filter_params['maxPrice'],
+            'minRam' => $filter_params['minRam'],
+            'maxRam' => $filter_params['maxRam'],
+            'minStorage' => $filter_params['minStorage'],
+            'maxStorage' => $filter_params['maxStorage'],
+            'minSize' => $filter_params['minSize'],
+            'maxSize' => $filter_params['maxSize'],
+            'minWeight' => $filter_params['minWeight'],
+            'maxWeight' => $filter_params['maxWeight'],
+            'brand' => $filter_params['brand'],
+        ]);
     }
 
     public function find($id)
     {
         $sql = "SELECT * FROM $this->t WHERE id = $id";
+        return $this->fetchOne($sql);
+    }
+
+    public function findAllFilters()
+    {
+        $sql = "SELECT 
+        min(price) as minPrice, max(price) as maxPrice,
+        min(ram) as minRam, max(ram) as maxRam,
+        min(storage) as minStorage, max(storage) as maxStorage, 
+        min(size) as minSize, max(size) as maxSize, 
+        min(weight) as minWeight, max(weight) as maxWeight
+        FROM $this->t";
         return $this->fetchOne($sql);
     }
 

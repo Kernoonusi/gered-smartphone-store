@@ -1,6 +1,5 @@
 import { Link } from "@tanstack/react-router";
 import { ShoppingCart } from "lucide-react";
-import ky from "ky";
 import { useEffect, useState } from "react";
 
 import { Input } from "@shadcnUi/input";
@@ -8,10 +7,8 @@ import { Button } from "@shadcnUi/button";
 import "./header.css";
 import { Skeleton } from "@shadcnUi/skeleton";
 import { ProfileButton } from "./profileButton";
-
-interface IBrand {
-  brand: string;
-}
+import { productsService } from "@/services/products.service";
+import { IBrand } from "@/types";
 
 function SkeletonBrands() {
   return (
@@ -30,9 +27,7 @@ function SkeletonBrands() {
 export const Header = () => {
   const fetchData = async () => {
     try {
-      const response: IBrand[] = await ky(
-        "http://gered-store-back.lndo.site/products/brands?limit=7",
-      ).json();
+      const response: IBrand[] = await productsService.getBrands(7);
       return response;
     } catch (error) {
       console.error("Error fetching data:", error);
@@ -109,7 +104,7 @@ export const Header = () => {
           </nav>
         </div>
       </header>
-      <nav className="overflow-hidden sticky top-0">
+      <nav className="overflow-hidden sticky top-0 z-50">
         <div className="w-screen overflow-hidden transition-all flex justify-center sticky top-0 bg-fuchsia-900">
           <Link to="/" className="anim-elem w-fit transition-all text-3xl p-2 h-full text-cyan-300">
             G
