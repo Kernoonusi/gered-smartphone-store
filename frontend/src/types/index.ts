@@ -20,6 +20,7 @@ export interface IUser {
   name: string;
   email: string;
   cart?: ICartItem[];
+  address?: string;
 }
 
 export interface IBrand {
@@ -60,4 +61,13 @@ interface IFilterSendWithoutBrand {
 export interface IFilterSend {
   filters?: IFilterSendWithoutBrand;
   brands?: IBrand[];
+}
+
+export interface IOrder {
+  address: string;
+  note?: string;
+  products: {
+    id: number;
+    count: number;
+  }[];
 }

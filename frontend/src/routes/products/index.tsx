@@ -18,7 +18,7 @@ import MultipleSelector, { Option } from "@/components/ui/multiple-selector";
 
 export const Route = createFileRoute("/products/")({
   loader: async () => {
-    const products = productsService.getProducts(10);
+    const products = productsService.getProducts(20);
     const filters = await productsService.getFilters();
     const newFilters = {
       ...filters,
@@ -40,30 +40,30 @@ export function Index() {
   const [filteredProducts, setProducts] = useState<IProduct[]>([]);
   const [ram, setRam] = useState([filters.minRam, filters.maxRam]);
   const [storage, setStorage] = useState([filters.minStorage, filters.maxStorage]);
-  const [size, setSize] = useState([+filters.minSize, +filters.maxSize]);
+  const [size, setSize] = useState([filters.minSize, filters.maxSize]);
   const [weight, setWeight] = useState([filters.minWeight, filters.maxWeight]);
   const [brandIsOpen, setBrandIsOpen] = useState(false);
   const [isPending, startTransition] = useTransition();
 
   const formSchema = z.object({
-    minPrice: z.number().min(+filters.minPrice).max(+filters.maxPrice),
-    maxPrice: z.number().min(+filters.minPrice).max(+filters.maxPrice),
+    minPrice: z.number().min(Math.floor(filters.minPrice)).max(Math.round(filters.maxPrice)),
+    maxPrice: z.number().min(Math.floor(filters.minPrice)).max(Math.round(filters.maxPrice)),
     brand: z.array(z.object({ value: z.string(), label: z.string() })),
     ram: z.array(z.number().min(filters.minRam).max(filters.maxRam)),
     storage: z.array(z.number().min(filters.minStorage).max(filters.maxStorage)),
-    size: z.array(z.number().min(+filters.minSize).max(+filters.maxSize)),
+    size: z.array(z.number().min(filters.minSize).max(filters.maxSize)),
     weight: z.array(z.number().min(0).max(1000000)),
   });
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      minPrice: +filters.minPrice,
-      maxPrice: +filters.maxPrice,
+      minPrice: Math.floor(filters.minPrice),
+      maxPrice: Math.round(filters.maxPrice),
       brand: [],
       ram: [filters.minRam, filters.maxRam],
       storage: [filters.minStorage, filters.maxStorage],
-      size: [+filters.minSize, +filters.maxSize],
+      size: [filters.minSize, filters.maxSize],
       weight: [filters.minWeight, filters.maxWeight],
     },
   });
@@ -71,7 +71,7 @@ export function Index() {
   function onSubmit(values: z.infer<typeof formSchema>) {
     startTransition(() => {
       productsService
-        .getProducts(10, {
+        .getProducts(20, {
           brands: values.brand.map((brand) => {
             return { brand: brand.value };
           }),
@@ -90,9 +90,8 @@ export function Index() {
         })
         .then((data) => {
           setProducts(data);
-        });        
+        });
     });
-    console.log(filteredProducts);
   }
   return (
     <div className="w-full md:w-10/12 mt-6 grid grid-cols-[auto_1fr] grid-rows-[auto_1fr] gap-6 mx-auto">
@@ -118,6 +117,8 @@ export function Index() {
                           className="rounded-r-none content"
                           type="number"
                           placeholder="От"
+                          min={Math.floor(filters.minPrice)}
+                          max={Math.round(filters.maxPrice)}
                         />
                       </FormControl>
                       <FormMessage />
@@ -135,6 +136,8 @@ export function Index() {
                           className="rounded-l-none"
                           type="number"
                           placeholder="До"
+                          min={Math.floor(filters.minPrice)}
+                          max={Math.round(filters.maxPrice)}
                         />
                       </FormControl>
                       <FormMessage />
@@ -150,9 +153,7 @@ export function Index() {
                     <FormLabel>Бренды</FormLabel>
                     <FormControl>
                       <div
-                        onFocus={() => {
-                          setBrandIsOpen(!brandIsOpen);
-                        }}
+                        onFocus={() => setBrandIsOpen(true)}
                         onBlur={() => setBrandIsOpen(false)}>
                         <MultipleSelector
                           onChange={field.onChange}
@@ -170,7 +171,7 @@ export function Index() {
                   </FormItem>
                 )}
               />
-              <div className={`transition-all h-${brandIsOpen ? "[250px]" : "0"}`}/>
+              <div className={`transition-all h-${brandIsOpen ? "[250px]" : "0"}`} />
               <FormField
                 control={form.control}
                 name="ram"
@@ -273,7 +274,7 @@ export function Index() {
           </Button>
         </CardFooter>
       </Card>
-      <div className="grid gap-4 grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
+      <div className="grid gap-4 auto-rows-min grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
         {filteredProducts.length === 0 ? (
           <Suspense fallback={<div>Loading...</div>}>
             <Await promise={products}>

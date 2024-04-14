@@ -51,20 +51,19 @@ class Products extends Table
         if ($limit > 0) {
             $sql .= " LIMIT $limit";
         }
-        // var_dump($sql);
-        return $this->fetchAll($sql, [
+        $params = [
             'minPrice' => $filter_params['minPrice'],
             'maxPrice' => $filter_params['maxPrice'],
             'minRam' => $filter_params['minRam'],
             'maxRam' => $filter_params['maxRam'],
             'minStorage' => $filter_params['minStorage'],
             'maxStorage' => $filter_params['maxStorage'],
-            'minSize' => $filter_params['minSize'],
-            'maxSize' => $filter_params['maxSize'],
+            'minSize' => $filter_params['minSize'] - 0.1,
+            'maxSize' => $filter_params['maxSize'] + 0.1,
             'minWeight' => $filter_params['minWeight'],
-            'maxWeight' => $filter_params['maxWeight'],
-            'brand' => $filter_params['brand'],
-        ]);
+            'maxWeight' => $filter_params['maxWeight']
+        ];
+        return $this->fetchAll($sql, $params);
     }
 
     public function find($id)

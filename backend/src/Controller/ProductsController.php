@@ -111,18 +111,16 @@ class ProductsController extends Controller
         if ($this->limit) {
             if ($this->filters['brand'] != "") {
                 $prepared_filters = [
-                    "minPrice" => "price >= :minPrice",
-                    "maxPrice" => "price <= :maxPrice",
-                    "minRam" => "ram >= :minRam",
-                    "maxRam" => "ram <= :maxRam",
-                    "minStorage" => "storage >= :minStorage",
-                    "maxStorage" => "storage <= :maxStorage",
-                    "minSize" => "size >= :minSize",
-                    "maxSize" => "size <= :maxSize",
-                    "minWeight" => "weight >= :minWeight",
-                    "maxWeight" => "weight <= :maxWeight",
-                    "brand" => "brand = :brand",
+                    "price" => "price BETWEEN :minPrice AND :maxPrice",
+                    "ram" => "ram BETWEEN :minRam and :maxRam",
+                    "storage" => "storage BETWEEN :minStorage and :maxStorage",
+                    "size" => "size BETWEEN :minSize and :maxSize",
+                    "weight" => "weight BETWEEN :minWeight and :maxWeight"
                 ];
+                if ($this->filters['brand'] != "all") {
+                    $filter_brands = explode("_", $this->filters['brand']);
+                    $prepared_filters['brand'] = "brand IN ('" . implode("', '", $filter_brands) . "')";
+                }
                 $result = $this->tableGateway->findProductsWithFilters($prepared_filters, $this->filters, $this->limit);
             } else {
                 $result = $this->tableGateway->findAll($this->limit);

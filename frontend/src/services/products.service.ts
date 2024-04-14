@@ -5,11 +5,11 @@ export const productsService = {
   getProducts: async (limit = 5, filters: IFilter | null = null) => {
     if (!filters) return (await kyApi.get(`products?limit=${limit}`).json()) as IProduct[];
     const { filters: filt, brands } = filters || {};
+    const brandsArray = brands[0] ? brands.map((brand) => brand.brand) : [];
+    
     const preparedFilters = filters
-      ? `&minPrice=${filt.minPrice}&maxPrice=${filt.maxPrice}&brand=${brands[0].brand}&minRam=${filt.minRam}&maxRam=${filt.maxRam}&minStorage=${filt.minStorage}&maxStorage=${filt.maxStorage}&minSize=${filt.minSize}&maxSize=${filt.maxSize}&minWeight=${filt.minWeight}&maxWeight=${filt.maxWeight}`
+      ? `&minPrice=${filt.minPrice}&maxPrice=${filt.maxPrice}&brand=${brands[0] ? brandsArray.join("_") : "all"}&minRam=${filt.minRam}&maxRam=${filt.maxRam}&minStorage=${filt.minStorage}&maxStorage=${filt.maxStorage}&minSize=${filt.minSize}&maxSize=${filt.maxSize}&minWeight=${filt.minWeight}&maxWeight=${filt.maxWeight}`
       : "";
-    console.log(preparedFilters);
-
     const response: IProduct[] = await kyApi
       .get(`products?limit=${limit}${filters ? `${preparedFilters}` : ""}`)
       .json();
