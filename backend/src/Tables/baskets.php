@@ -32,4 +32,9 @@ class Baskets extends Table
         $sql = "DELETE FROM $this->t WHERE user_id = :user_id AND product_id = :product_id";
         $this->execute($sql, ['user_id' => $user_id, 'product_id' => $product_id]);
     }
+
+    public function clearByUserId(int $user_id){
+        $sql = "DELETE FROM $this->t WHERE user_id = :user_id";
+        $this->execute($sql, ['user_id' => $user_id]);
+    }
 }

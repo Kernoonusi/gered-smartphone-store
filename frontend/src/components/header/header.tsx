@@ -121,8 +121,11 @@ export const Header = () => {
               <Button
                 variant={"ghost"}
                 className="rounded-none text-gray-300 text-2xl py-7"
-                key={brand}>
-                {brand}
+                key={brand}
+                asChild>
+                <Link to="/products" search={{ brandSearch: brand }}>
+                  {brand}
+                </Link>
               </Button>
             ))
           )}

@@ -9,6 +9,7 @@ class Orders extends Table
     private $t = 'orders';
     private $t1 = 'order_products';
     private $t2 = 'products';
+    private $t3 = 'statuses';
 
     public function __construct(private $db)
     {
@@ -17,12 +18,21 @@ class Orders extends Table
 
     public function findByUserId(int $id)
     {
-        $sql = "SELECT o.user_id, o.status_id, o.note, op.quantity, p.nameProduct, p.price FROM $this->t as o
+        $sql = "SELECT o.id, s.name as status, o.note,
+        GROUP_CONCAT(op.product_id SEPARATOR ';') as ids,
+        GROUP_CONCAT(op.quantity SEPARATOR ';') as quantities,
+        GROUP_CONCAT(p.nameProduct SEPARATOR ';') as nameProducts,
+        GROUP_CONCAT(p.price SEPARATOR ';') as prices,
+        SUM(p.price * op.quantity) as total
+        FROM $this->t as o
         INNER JOIN $this->t1 as op
         INNER JOIN $this->t2 as p
+        INNER JOIN $this->t3 as s
         ON o.id = op.order_id
         AND op.product_id = p.id
-        WHERE o.user_id = :id";
+        AND o.status_id = s.id
+        WHERE o.user_id = :id
+        GROUP BY o.id";
         return $this->fetchAll($sql, ['id' => $id]);
     }
 

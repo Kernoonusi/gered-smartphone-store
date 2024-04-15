@@ -77,4 +77,15 @@ export const cartService = {
       }
     }
   },
+  clearCart: async () => {
+    localStorage.removeItem("cart");
+    useUserStore.getState().updateCart([]);
+    kyApi
+      .post("cart/clear", {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("jwt")}`,
+        },
+      })
+      .json();
+  },
 };

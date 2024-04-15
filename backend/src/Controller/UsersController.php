@@ -32,6 +32,7 @@ class UsersController extends Controller
                 'login' => 'login',
                 'create' => 'createUserFromRequest',
                 'me' => 'getUser',
+                'admin' => 'isAdminByEmail',
             ]
         );
         $this->tableGateway = new Users($db);
@@ -85,6 +86,21 @@ class UsersController extends Controller
             return $this->unprocessableEntityResponse();
         }
         $result = $this->tableGateway->findByEmail($decoded['data']->email);
+        if (!$result) {
+            return $this->notFoundResponse();
+        }
+        $response['status_code_header'] = 200;
+        $response['body'] = json_encode($result);
+        return $response;
+    }
+
+    private function isAdminByEmail(){
+        $token = explode(' ', $this->headers['Authorization'])[1];
+        $decoded = $this->validateToken($token);
+        if (!$decoded) {
+            return $this->unprocessableEntityResponse();
+        }
+        $result = $this->tableGateway->isAdminByEmail($decoded['data']->email);
         if (!$result) {
             return $this->notFoundResponse();
         }

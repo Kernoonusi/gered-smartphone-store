@@ -27,6 +27,13 @@ class Users extends Table
         return $this->fetchOne($sql, ['email' => $email]);
     }
 
+    public function isAdminByEmail(string $email){
+        $sql = "SELECT role
+        FROM " . $this->t . "
+        WHERE email = :email";
+        return $this->fetchOne($sql, ['email' => $email]);
+    }
+
     public function insert($data)
     {
         $sql = "INSERT INTO $this->t (name, email, password) VALUES (:name, :email, :password)";

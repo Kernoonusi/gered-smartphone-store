@@ -71,3 +71,15 @@ export interface IOrder {
     count: number;
   }[];
 }
+
+export interface IOrderProfile {
+  status: string;
+  note?: string;
+  products: {
+    id: number;
+    name: string;
+    price: number;
+    count: number;
+  }[];
+  total: number;
+}

@@ -13,11 +13,14 @@ import { orderFormSchema } from "@/schemas";
 import { orderService } from "@/services/order.service";
 import { ICartItem, IOrder } from "@/types";
 import { HTTPError } from "ky";
+import { useDialogStore } from "@/routes/cart";
+import { cartService } from "@/services/cart.service";
 
 export function OrderForm() {
   const [error, setError] = useState<string | undefined>();
   const [isPending, startTransition] = useTransition();
   const user = useUserStore((state) => state);
+  const { close, open } = useDialogStore((state) => state);
   const form = useForm<z.infer<typeof orderFormSchema>>({
     resolver: zodResolver(orderFormSchema),
     defaultValues: {
@@ -39,6 +42,11 @@ export function OrderForm() {
         .createOrder(order)
         .then(() => {
           form.reset();
+          close();
+          cartService.clearCart();
+          setTimeout(() => {
+            open();
+          }, 2000);
         })
         .catch((error) => {
           if (error instanceof HTTPError) {
@@ -109,7 +117,7 @@ export function OrderForm() {
             )}
           />
           {error && <p className="text-red-500">{error}</p>}
-          <Button onClick={() => form.handleSubmit(onSubmit)()} disabled={isPending}>
+          <Button disabled={isPending}>
             {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
             Оформить
           </Button>

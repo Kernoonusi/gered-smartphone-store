@@ -14,8 +14,10 @@ import { createFileRoute } from '@tanstack/react-router'
 
 import { Route as rootRoute } from './routes/__root'
 import { Route as IndexImport } from './routes/index'
+import { Route as ProfileIndexImport } from './routes/profile/index'
 import { Route as ProductsIndexImport } from './routes/products/index'
 import { Route as CartIndexImport } from './routes/cart/index'
+import { Route as AdminIndexImport } from './routes/admin/index'
 import { Route as ProductsProductIdImport } from './routes/products/$productId'
 
 // Create Virtual Routes
@@ -34,6 +36,11 @@ const IndexRoute = IndexImport.update({
   getParentRoute: () => rootRoute,
 } as any)
 
+const ProfileIndexRoute = ProfileIndexImport.update({
+  path: '/profile/',
+  getParentRoute: () => rootRoute,
+} as any)
+
 const ProductsIndexRoute = ProductsIndexImport.update({
   path: '/products/',
   getParentRoute: () => rootRoute,
@@ -41,6 +48,11 @@ const ProductsIndexRoute = ProductsIndexImport.update({
 
 const CartIndexRoute = CartIndexImport.update({
   path: '/cart/',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const AdminIndexRoute = AdminIndexImport.update({
+  path: '/admin/',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -65,12 +77,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProductsProductIdImport
       parentRoute: typeof rootRoute
     }
+    '/admin/': {
+      preLoaderRoute: typeof AdminIndexImport
+      parentRoute: typeof rootRoute
+    }
     '/cart/': {
       preLoaderRoute: typeof CartIndexImport
       parentRoute: typeof rootRoute
     }
     '/products/': {
       preLoaderRoute: typeof ProductsIndexImport
+      parentRoute: typeof rootRoute
+    }
+    '/profile/': {
+      preLoaderRoute: typeof ProfileIndexImport
       parentRoute: typeof rootRoute
     }
   }
@@ -82,8 +102,10 @@ export const routeTree = rootRoute.addChildren([
   IndexRoute,
   AboutLazyRoute,
   ProductsProductIdRoute,
+  AdminIndexRoute,
   CartIndexRoute,
   ProductsIndexRoute,
+  ProfileIndexRoute,
 ])
 
 /* prettier-ignore-end */

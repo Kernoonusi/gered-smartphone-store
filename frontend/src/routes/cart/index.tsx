@@ -10,6 +10,7 @@ import { ICartItem } from "@/types";
 import { Await, createFileRoute, defer } from "@tanstack/react-router";
 import { Minus, Plus, Trash } from "lucide-react";
 import { Suspense } from "react";
+import { create } from "zustand";
 
 export const Route = createFileRoute("/cart/")({
   loader: async () => {
@@ -29,12 +30,25 @@ export const Route = createFileRoute("/cart/")({
   component: Index,
 });
 
+type DialogStore = {
+  isFinish: boolean;
+  open: () => void;
+  close: () => void;
+};
+
+export const useDialogStore = create<DialogStore>((set) => ({
+  isFinish: false,
+  open: () => set({ isFinish: true }),
+  close: () => set({ isFinish: false }),
+}));
+
 function Index() {
+  const { isFinish } = useDialogStore();
   const { products } = Route.useLoaderData();
   const cart = useUserStore((state) => state.cart);
   return (
     <main className="w-full md:w-10/12 mt-6 flex flex-col gap-12 mx-auto">
-      {cart === undefined ? null : (
+      {cart === undefined || cart.length === 0 ? null : (
         <div className="flex gap-4 items-end">
           <h2 className="text-3xl font-semibold">Корзина</h2>
           <p className="text-zinc-500">
@@ -45,12 +59,12 @@ function Index() {
       )}
       <div className="flex justify-between gap-4">
         <article className="flex flex-col gap-4">
-          {cart === undefined ? (
+          {cart === undefined || cart.length === 0? (
             <p className="text-3xl">Ваша корзина пока пуста</p>
           ) : (
             cart.map((item) => (
               <div key={item.id} className="grid grid-cols-4 grid-rows-3 gap-2">
-                <img src="xiaomiTel.jpg" alt="" className="h-24 w-auto row-span-3" />
+                <img src="http://gered-store-back.lndo.site/smartphones/xiaomiTel.jpg" alt="" className="h-24 w-auto row-span-3" />
                 <p className="row-span-1">
                   {item.brand} {item.nameProduct}
                 </p>
@@ -86,6 +100,7 @@ function Index() {
             ))
           )}
         </article>
+        {cart === undefined || cart.length === 0 ? null : (
         <Card className="flex h-fit flex-col justify-between transition-all">
           <CardHeader>
             <CardTitle>К оплате</CardTitle>
@@ -105,20 +120,24 @@ function Index() {
                 {cart?.reduce((acc, item) => acc + item.price * item.countBasket, 0).toFixed(2)}₽
               </p>
             </p>
-            {useUserStore.getState().email ? (
-              <Dialog>
-                <DialogTrigger>
-                  <Button>Перейти к оформлению</Button>
-                </DialogTrigger>
-                <DialogContent>
-                  <OrderForm />
-                </DialogContent>
-              </Dialog>
-            ) : (
+            {useUserStore.getState().email ? 
+              isFinish ? (
+                <Button>Заказ оформлен</Button>
+              ) : (
+                <Dialog>
+                  <DialogTrigger>
+                    <Button>Перейти к оформлению</Button>
+                  </DialogTrigger>
+                  <DialogContent>
+                    <OrderForm />
+                  </DialogContent>
+                </Dialog>
+              )
+            : (
               <Button>Необходима авторизация</Button>
             )}
           </CardFooter>
-        </Card>
+        </Card>)}
       </div>
       <h2>Рекомендуем</h2>
       <article className="grid grid-cols-5 gap-4">

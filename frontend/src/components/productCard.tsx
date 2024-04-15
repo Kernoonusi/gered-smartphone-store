@@ -13,7 +13,7 @@ export function ProductCard({ item }: { item: IProduct }) {
     <Card className="flex flex-col justify-between">
       <CardHeader>
         <Link to={`/products/$productId`} params={{ productId: item.id.toString() }}>
-          <img src="xiaomiTel.jpg" alt="" />
+          <img src="http://gered-store-back.lndo.site/smartphones/xiaomiTel.jpg" alt="" />
         </Link>
       </CardHeader>
       <CardContent>

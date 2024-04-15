@@ -112,7 +112,7 @@ export function RegForm() {
             )}
           />
           {error && <p className="text-red-500">{error}</p>}
-          <Button onClick={() => form.handleSubmit(onSubmit)()} disabled={isPending}>
+          <Button disabled={isPending}>
             {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
             Зарегистрироваться
           </Button>

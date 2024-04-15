@@ -36,6 +36,7 @@ class BasketsController extends Controller
                 'add' => 'addProductToBasket',
                 'remove' => 'removeProductFromBasket',
                 'me' => 'getUserBasket',
+                'clear' => 'clearBasket'
             ]
         );
         $this->basketId = $formData['id'] ?? null;
@@ -142,6 +143,27 @@ class BasketsController extends Controller
         $response['body'] = json_encode(
             array(
                 "message" => "Продукт добавлен в корзину",
+            )
+        );
+        return $response;
+    }
+
+    public function clearBasket()
+    {
+        $token = explode(' ', $this->headers['Authorization'])[1];
+        $decoded = $this->validateToken($token);
+        if (!$decoded) {
+            return $this->unprocessableEntityResponse();
+        }
+        $user = $this->tableGatewayUsers->findByEmail($decoded['data']->email);
+        if (!$user) {
+            return $this->notFoundResponse();
+        }
+        $this->tableGateway->clearByUserId($user['id']);
+        $response['status_code_header'] = 200;
+        $response['body'] = json_encode(
+            array(
+                "message" => "Корзина очищена",
             )
         );
         return $response;

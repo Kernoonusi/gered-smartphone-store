@@ -16,9 +16,18 @@ import { Loader2 } from "lucide-react";
 import { IProduct } from "@/types";
 import MultipleSelector, { Option } from "@/components/ui/multiple-selector";
 
+const searchSchema = z.object({
+  brandSearch: z.string().optional(),
+});
+
+type BrandSearch = z.infer<typeof searchSchema>;
+
 export const Route = createFileRoute("/products/")({
-  loader: async () => {
-    const products = productsService.getProducts(20);
+  validateSearch: (search) => {
+    return searchSchema.parse(search);
+  },
+  loaderDeps: ({ search }) => ({ search }),
+  loader: async ({ deps: search }) => {
     const filters = await productsService.getFilters();
     const newFilters = {
       ...filters,
@@ -27,12 +36,22 @@ export const Route = createFileRoute("/products/")({
         value: brand.brand,
       })) as Option[],
     };
+    let products: Promise<IProduct[]>;
+    if (search.search.brandSearch !== undefined) {
+      products = productsService.getProducts(20, {
+        filters: filters.filters,
+        brands: [{ brand: search.search.brandSearch }],
+      });
+    } else {
+      products = productsService.getProducts(20);
+    }
     return { products: defer(products), filters: newFilters };
   },
   component: Index,
 });
 
 export function Index() {
+  const { brandSearch }: BrandSearch = Route.useSearch();
   const {
     products,
     filters: { filters, brands },
@@ -60,7 +79,7 @@ export function Index() {
     defaultValues: {
       minPrice: Math.floor(filters.minPrice),
       maxPrice: Math.round(filters.maxPrice),
-      brand: [],
+      brand: brandSearch ? [{ value: brandSearch, label: brandSearch }] : [],
       ram: [filters.minRam, filters.maxRam],
       storage: [filters.minStorage, filters.maxStorage],
       size: [filters.minSize, filters.maxSize],
