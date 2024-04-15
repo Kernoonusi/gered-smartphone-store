@@ -1,5 +1,6 @@
 backend/vendor/
 backend/.env
+backend/public/smartphones
 
 # Logs
 frontend/logs
