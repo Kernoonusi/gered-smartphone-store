@@ -1,6 +1,7 @@
 backend/vendor/
 backend/.env
-backend/public/smartphones
+backend/public/smartphones/*
+backend/public/carousel/*
 
 # Logs
 frontend/logs
