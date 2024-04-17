@@ -5,6 +5,8 @@ namespace Src\Controller;
 use Src\Core\Controller;
 use Src\Tables\Products;
 
+require APP_PATH . '/src/Config/Constants.php';
+
 class ProductsController extends Controller
 {
     private Products $tableGateway;
@@ -46,8 +48,8 @@ class ProductsController extends Controller
                 'count'
             ],
             [
-                'create' => 'createProductFromRequest',
-                'update' => 'updateProductFromRequest',
+                'create' => 'createProduct',
+                'update' => 'updateProduct',
                 'delete' => 'deleteProduct',
                 'products' => 'getAllProducts',
                 'new' => 'getNewProducts',
@@ -88,10 +90,12 @@ class ProductsController extends Controller
                 // }
                 break;
             case 'POST':
-                $response = $this->createProductFromRequest();
+                if ($this->route != "") {
+                    $response = call_user_func([$this, $this->routeActions[$this->route]]);
+                }
                 break;
             case 'PUT':
-                $response = $this->updateProductFromRequest($this->productId);
+                $response = $this->updateProduct($this->productId);
                 break;
             case 'DELETE':
                 $response = $this->deleteProduct($this->productId);
@@ -169,19 +173,67 @@ class ProductsController extends Controller
         return $response;
     }
 
-    private function createProductFromRequest()
+    private function createProduct()
     {
-        $input = (array) json_decode(file_get_contents('php://input'), TRUE);
+        $input = [
+            "nameProduct" => $_POST["nameProduct"],
+            "brand" => $_POST["brand"],
+            "price" => $_POST["price"],
+            "ram" => $_POST["ram"],
+            "soc" => $_POST["soc"],
+            "storage" => $_POST["storage"],
+            "size" => $_POST["size"],
+            "weight" => $_POST["weight"],
+            "releaseYear" => $_POST["releaseYear"],
+            "description" => $_POST["description"],
+            "count" => $_POST["count"]
+        ];
         if (!$this->validate($input)) {
             return $this->unprocessableEntityResponse();
         }
+        $images = $_FILES['images'];
+        $targetDirectory = APP_PATH . '/public/smartphones/';
+        $view_of_image = ["", "2", "Front", "LeftSide", "RightSide", "Side", "UpSide"];
+        $i = 0;
+        foreach ($images['tmp_name'] as $key => $tmpName) {
+            if ($tmpName == '') {
+                continue;
+            }
+            $targetFile = $targetDirectory . $_POST["brand"] . '_' . implode('_', explode(' ', $_POST["nameProduct"])) . "Tel" . $view_of_image[$i] . ".jpg";
+            // $imageFileType = strtolower(pathinfo($targetFile, PATHINFO_EXTENSION));
+            if (!getimagesize($tmpName)) {
+                $result = "Файл " . htmlspecialchars(basename($images['name'][$key])) . " не является изображением.\n";
+                $response['status_code_header'] = 400;
+                $response['body'] = json_encode(
+                    [
+                        'message' => $result,
+                    ]
+                );
+                return $response;
+            }
+            if (!move_uploaded_file($tmpName, $targetFile)) {
+                $result = "Произошла ошибка при загрузке файла " . htmlspecialchars(basename($images['name'][$key])) . ".\n";
+                $response['status_code_header'] = 400;
+                $response['body'] = json_encode(
+                    [
+                        'message' => $result,
+                    ]
+                );
+                return $response;
+            }
+            $i++;
+        }
         $this->tableGateway->insert($input);
         $response['status_code_header'] = 201;
-        $response['body'] = null;
+        $response['body'] = json_encode(
+            [
+                'message' => 'Продукт создан',
+            ]
+        );
         return $response;
     }
 
-    private function updateProductFromRequest($id)
+    private function updateProduct($id)
     {
         $result = $this->tableGateway->find($id);
         if (!$result) {

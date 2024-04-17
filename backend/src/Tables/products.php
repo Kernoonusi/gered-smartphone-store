@@ -92,8 +92,21 @@ class Products extends Table
 
     public function insert($data)
     {
-        $sql = "INSERT INTO $this->t (name, price) VALUES (:name, :price)";
-        $this->execute($sql, $data);
+        $sql = "INSERT INTO $this->t 
+        (nameProduct, price, description, ram, storage, soc, weight, size, brand, releaseYear, count) 
+        VALUES (:nameProduct, :price, :description, :ram, :storage, :soc, :weight, :size, :brand, :releaseYear, :count)";
+        $this->execute($sql, [
+            'nameProduct' => $data['nameProduct'],
+            'price' => $data['price'],
+            'description' => $data['description'],
+            'ram' => $data['ram'],
+            'storage' => $data['storage'],
+            'soc' => $data['soc'],
+            'weight' => $data['weight'],
+            'size' => $data['size'],
+            'brand' => $data['brand'],
+            'releaseYear' => $data['releaseYear'],
+            'count' => $data['count']]);
     }
 
     public function update($id, $data)

@@ -60,7 +60,7 @@ export function Index() {
           <p className="text-zinc-500">Ваша почта: {user.email}</p>
           {isAdmin && (
             <Button className="w-fit">
-              <Link to="/profile">Войти в админ панель</Link>
+              <Link to="/admin">Войти в админ панель</Link>
             </Button>
           )}
         </CardContent>

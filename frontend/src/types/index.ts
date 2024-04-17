@@ -9,6 +9,7 @@ export interface IProduct {
   weight: number;
   size: string;
   brand: string;
+  releaseYear: number;
   count: number;
 }
 

@@ -1,5 +1,6 @@
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
 import { cartService } from "@/services/cart.service";
+import { imagesService } from "@/services/images.service";
 import { IProduct } from "@/types";
 import { Button } from "@shadcnUi/button";
 import { Link } from "@tanstack/react-router";
@@ -13,7 +14,7 @@ export function ProductCard({ item }: { item: IProduct }) {
     <Card className="flex flex-col justify-between">
       <CardHeader>
         <Link to={`/products/$productId`} params={{ productId: item.id.toString() }}>
-          <img src="http://gered-store-back.lndo.site/smartphones/xiaomiTel.jpg" alt="" />
+          <img src={imagesService.getFrontImage(item)} alt="" />
         </Link>
       </CardHeader>
       <CardContent>

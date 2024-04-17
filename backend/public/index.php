@@ -43,6 +43,10 @@ function getFormData($method)
     return $data;
 }
 
+if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+    exit();
+}
+
 $requestMethod = $_SERVER["REQUEST_METHOD"];
 $formData = getFormData($requestMethod);
 $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);

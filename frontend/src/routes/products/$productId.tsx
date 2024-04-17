@@ -5,6 +5,7 @@ import { ShoppingCart } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { IProduct } from "@/types";
 import { cartService } from "@/services/cart.service";
+import { imagesService } from "@/services/images.service";
 
 export const Route = createFileRoute("/products/$productId")({
   component: Index,
@@ -18,10 +19,32 @@ export function Index() {
   const addCart = (item: IProduct) => {
     cartService.addToCart(item);
   };
+  const images = imagesService.getAllSmartPhoneImages(product);
   return (
-    <div className="w-full md:w-10/12 mt-6 flex flex-col gap-12 mx-auto">
-      <header className="grid grid-cols-[auto_auto_auto] grid-rows-[auto_auto]">
-        <img src={"http://gered-store-back.lndo.site/smartphones/xiaomiTel.jpg"} alt="" className="max-w-sm row-span-2" />
+    <main className="w-full md:w-10/12 mt-6 flex flex-col gap-12 mx-auto">
+      <header className="grid grid-cols-[auto_auto_auto_auto] grid-rows-[auto_auto]">
+        <div className="row-span-2 flex flex-col gap-2">
+          {images.map((image, index) => (
+            <img
+              key={index}
+              src={image}
+              srcSet=""
+              className="w-14 h-14 object-cover"
+              alt=""
+              onMouseEnter={(e) => {
+                const target = e.currentTarget as HTMLImageElement;
+                const mainImage = document.getElementById("main-image") as HTMLImageElement;
+                mainImage.src = target.src;
+              }}
+            />
+          ))}
+        </div>
+        <img
+          src={imagesService.getFrontImage(product)}
+          alt=""
+          id="main-image"
+          className="max-w-sm row-span-2"
+        />
         <p className="text-4xl font-semibold col-span-2">
           Смартфон {product.brand} {product.nameProduct} {product.ram}гб + {product.storage}гб
         </p>
@@ -29,7 +52,9 @@ export function Index() {
         <div className="flex flex-col justify-between bg-slate-200 rounded-3xl p-6">
           <p className="text-4xl font-semibold">{product.price}₽</p>
           <p>в наличии: {product.count}</p>
-          <Button onClick={() => addCart(product)} className="grid grid-cols-[auto_auto_1fr_auto] bg-cyan-500 place-content-center px-6 py-6 gap-2">
+          <Button
+            onClick={() => addCart(product)}
+            className="grid grid-cols-[auto_auto_1fr_auto] bg-cyan-500 place-content-center px-6 py-6 gap-2">
             <ShoppingCart />
             В корзину
             <div />
@@ -53,6 +78,6 @@ export function Index() {
           </TabsContent>
         </Tabs>
       </div>
-    </div>
+    </main>
   );
 }
