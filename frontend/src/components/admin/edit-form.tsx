@@ -1,13 +1,17 @@
 import { IProduct } from "@/types";
 import { Dialog, DialogHeader, DialogTrigger, DialogContent, DialogTitle } from "@shadcnUi/dialog";
 import { Input } from "@shadcnUi/input";
-import { PencilLine } from "lucide-react";
+import { Loader2, PencilLine } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { Button } from "@shadcnUi/button";
 import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from "@shadcnUi/form";
 import { Textarea } from "@shadcnUi/textarea";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useTransition } from "react";
+import { imagesService } from "@/services/images.service";
+import { ImageEdit } from "./image-edit";
+
 
 const editProductSchema = z.object({
   id: z.number(),
@@ -35,11 +39,30 @@ const editProductSchema = z.object({
 });
 
 export function EditForm({ product }: { product: IProduct }) {
+  const [isPending, startTransition] = useTransition();
+  const photos = imagesService.getAllSmartPhoneImages(product);
   const editForm = useForm<z.infer<typeof editProductSchema>>({
     resolver: zodResolver(editProductSchema),
+    defaultValues: {
+      id: product.id,
+      nameProduct: product.nameProduct,
+      price: product.price,
+      description: product.description,
+      ram: product.ram,
+      storage: product.storage,
+      size: product.size,
+      brand: product.brand,
+      soc: product.soc,
+      weight: product.weight,
+      releaseYear: product.releaseYear,
+      count: product.count,
+    },
   });
   function onEditFormSubmit(data: z.infer<typeof editProductSchema>) {
-    console.log(data);
+    
+    startTransition(() => {
+      console.log(data);
+    });
   }
   return (
     <Dialog>
@@ -199,6 +222,14 @@ export function EditForm({ product }: { product: IProduct }) {
                 </FormItem>
               )}
             />
+            <div className="col-span-3 grid grid-cols-7 gap-4">
+              {photos.map((photo, index) => (
+                <img src={photo} key={index} alt="" />
+              ))}
+              <div className="col-span-7 justify-center flex gap-4">
+                <ImageEdit id={product.id} />
+              </div>
+            </div>
             <FormField
               control={editForm.control}
               name="description"
@@ -212,7 +243,8 @@ export function EditForm({ product }: { product: IProduct }) {
                 </FormItem>
               )}
             />
-            <Button type="submit" className="col-span-3 mx-auto w-fit">
+            <Button type="submit" disabled={isPending} className="col-span-4 mx-auto w-fit">
+              {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
               Сохранить
             </Button>
           </form>

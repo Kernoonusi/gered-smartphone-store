@@ -235,18 +235,62 @@ class ProductsController extends Controller
 
     private function updateProduct($id)
     {
-        $result = $this->tableGateway->find($id);
-        if (!$result) {
-            return $this->notFoundResponse();
+        if ($_POST["nameProduct"] == "" && $_FILES['images']['tmp_name']) {
+            $images = $_FILES['images'];
+            $targetDirectory = APP_PATH . '/public/smartphones/';
+            $view_of_image = ["", "2", "Front", "LeftSide", "RightSide", "Side", "UpSide"];
+            $product = $this->tableGateway->find($id);
+            $i = 0;
+            foreach ($images['tmp_name'] as $key => $tmpName) {
+                if ($tmpName == '') {
+                    continue;
+                }
+                $targetFile = $targetDirectory . $product["brand"] . '_' . implode('_', explode(' ', $product["nameProduct"])) . "Tel" . $view_of_image[$i] . ".jpg";
+                // $imageFileType = strtolower(pathinfo($targetFile, PATHINFO_EXTENSION));
+                if (!getimagesize($tmpName)) {
+                    $result = "Файл " . htmlspecialchars(basename($images['name'][$key])) . " не является изображением.\n";
+                    $response['status_code_header'] = 400;
+                    $response['body'] = json_encode(
+                        [
+                            'message' => $result,
+                        ]
+                    );
+                    return $response;
+                }
+                if (!move_uploaded_file($tmpName, $targetFile)) {
+                    $result = "Произошла ошибка при загрузке файла " . htmlspecialchars(basename($images['name'][$key])) . ".\n";
+                    $response['status_code_header'] = 400;
+                    $response['body'] = json_encode(
+                        [
+                            'message' => $result,
+                        ]
+                    );
+                    return $response;
+                }
+                $i++;
+            }
+        } else {
+            $input = [
+                "nameProduct" => $_POST["nameProduct"],
+                "brand" => $_POST["brand"],
+                "price" => $_POST["price"],
+                "ram" => $_POST["ram"],
+                "soc" => $_POST["soc"],
+                "storage" => $_POST["storage"],
+                "size" => $_POST["size"],
+                "weight" => $_POST["weight"],
+                "releaseYear" => $_POST["releaseYear"],
+                "description" => $_POST["description"],
+                "count" => $_POST["count"]
+            ];
+            if (!$this->validate($input)) {
+                return $this->unprocessableEntityResponse();
+            }
+            $this->tableGateway->update($input, $id);
+            $response['status_code_header'] = 200;
+            $response['body'] = null;
+            return $response;
         }
-        $input = (array) json_decode(file_get_contents('php://input'), TRUE);
-        if (!$this->validate($input)) {
-            return $this->unprocessableEntityResponse();
-        }
-        $this->tableGateway->update($id, $input);
-        $response['status_code_header'] = 200;
-        $response['body'] = null;
-        return $response;
     }
 
     private function deleteProduct($id)

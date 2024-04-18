@@ -51,8 +51,31 @@ export const productsService = {
       .post("products/create", {
         body: productFormData,
       })
-      .text();
+      .json();
 
+    return response;
+  },
+  updateProduct: async (id: string, product: z.infer<typeof addProductSchema>) => {
+    const productFormData = new FormData();
+    productFormData.append("nameProduct", product.nameProduct);
+    productFormData.append("price", String(product.price));
+    productFormData.append("description", product.description);
+    productFormData.append("ram", String(product.ram));
+    productFormData.append("storage", String(product.storage));
+    productFormData.append("size", product.size);
+    productFormData.append("brand", product.brand);
+    productFormData.append("soc", product.soc);
+    productFormData.append("weight", String(product.weight));
+    productFormData.append("releaseYear", String(product.releaseYear));
+    productFormData.append("count", String(product.count));
+    Array.from(product.images as FileList).forEach(file => {
+      productFormData.append('images[]', file);
+    });
+    const response = await kyApi
+      .post(`products/update?id=${id}`, {
+        body: productFormData,
+      })
+      .text();
     console.log(response);
     return response;
   },

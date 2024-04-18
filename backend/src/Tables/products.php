@@ -106,12 +106,30 @@ class Products extends Table
             'size' => $data['size'],
             'brand' => $data['brand'],
             'releaseYear' => $data['releaseYear'],
-            'count' => $data['count']]);
+            'count' => $data['count']
+        ]);
     }
 
     public function update($id, $data)
     {
-        $sql = "UPDATE $this->t SET name = :name, price = :price WHERE id = $id";
-        $this->execute($sql, $data);
+        $sql = "UPDATE $this->t SET 
+        name = :name, price = :price, description = :description,
+        ram = :ram, storage = :storage, soc = :soc,
+        weight = :weight, size = :size, brand = :brand,
+        releaseYear = :releaseYear, count = :count WHERE id = :id";
+        $this->execute($sql, [
+            'nameProduct' => $data['nameProduct'],
+            'price' => $data['price'],
+            'description' => $data['description'],
+            'ram' => $data['ram'],
+            'storage' => $data['storage'],
+            'soc' => $data['soc'],
+            'weight' => $data['weight'],
+            'size' => $data['size'],
+            'brand' => $data['brand'],
+            'releaseYear' => $data['releaseYear'],
+            'count' => $data['count'],
+            'id' => $id
+        ]);
     }
 }

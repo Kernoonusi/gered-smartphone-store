@@ -1,3 +1,4 @@
+import { kyApi } from "@/lib/ky";
 import { IProduct } from "@/types";
 
 export const imagesService = {
@@ -15,5 +16,18 @@ export const imagesService = {
       `http://gered-store-back.lndo.site/smartphones/${item.brand}_${item.nameProduct.split(" ")[0]}${item.nameProduct.split(" ")[1] ? "_" + item.nameProduct.split(" ")[1] : ""}TelUpSide.jpg`,
     ];
     return images;
+  },
+  updateAllPhotos: async ({ images, id }: { images: FileList; id: string }) => {
+    const imagesFormData = new FormData();
+    Array.from(images).forEach((file) => {
+      imagesFormData.append("images[]", file);
+    });
+    const response = await kyApi
+      .post(`products/update?id=${id}`, {
+        body: imagesFormData,
+      })
+      .text();
+    console.log(response);
+    return response;
   },
 };
