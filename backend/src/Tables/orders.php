@@ -64,4 +64,23 @@ class Orders extends Table
         $sql = "SELECT id FROM $this->t WHERE user_id = :id ORDER BY id DESC LIMIT 1";
         return $this->fetchOne($sql, ['id' => $id]);
     }
+
+    public function findAll()
+    {
+        $sql = "SELECT o.id, s.name as status, o.note,
+        GROUP_CONCAT(op.product_id SEPARATOR ';') as ids,
+        GROUP_CONCAT(op.quantity SEPARATOR ';') as quantities,
+        GROUP_CONCAT(p.nameProduct SEPARATOR ';') as nameProducts,
+        GROUP_CONCAT(p.price SEPARATOR ';') as prices,
+        SUM(p.price * op.quantity) as total
+        FROM $this->t as o
+        INNER JOIN $this->t1 as op
+        INNER JOIN $this->t2 as p
+        INNER JOIN $this->t3 as s
+        ON o.id = op.order_id
+        AND op.product_id = p.id
+        AND o.status_id = s.id
+        GROUP BY o.id";
+        return $this->fetchAll($sql);
+    }
 }

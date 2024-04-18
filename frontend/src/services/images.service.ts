@@ -3,17 +3,17 @@ import { IProduct } from "@/types";
 
 export const imagesService = {
   getFrontImage: (item: IProduct) => {
-    return `http://gered-store-back.lndo.site/smartphones/${item.brand}_${item.nameProduct.split(" ")[0]}${item.nameProduct.split(" ")[1] ? "_" + item.nameProduct.split(" ")[1] : ""}Tel.jpg`;
+    return `http://gered-store-back.lndo.site/smartphones/${item.brand}_${item.nameProduct.split(" ").join("_")}Tel.jpg`;
   },
   getAllSmartPhoneImages: (item: IProduct) => {
     const images = [
       imagesService.getFrontImage(item),
-      `http://gered-store-back.lndo.site/smartphones/${item.brand}_${item.nameProduct.split(" ")[0]}${item.nameProduct.split(" ")[1] ? "_" + item.nameProduct.split(" ")[1] : ""}Tel2.jpg`,
-      `http://gered-store-back.lndo.site/smartphones/${item.brand}_${item.nameProduct.split(" ")[0]}${item.nameProduct.split(" ")[1] ? "_" + item.nameProduct.split(" ")[1] : ""}TelFront.jpg`,
-      `http://gered-store-back.lndo.site/smartphones/${item.brand}_${item.nameProduct.split(" ")[0]}${item.nameProduct.split(" ")[1] ? "_" + item.nameProduct.split(" ")[1] : ""}TelLeftSide.jpg`,
-      `http://gered-store-back.lndo.site/smartphones/${item.brand}_${item.nameProduct.split(" ")[0]}${item.nameProduct.split(" ")[1] ? "_" + item.nameProduct.split(" ")[1] : ""}TelRightSide.jpg`,
-      `http://gered-store-back.lndo.site/smartphones/${item.brand}_${item.nameProduct.split(" ")[0]}${item.nameProduct.split(" ")[1] ? "_" + item.nameProduct.split(" ")[1] : ""}TelSide.jpg`,
-      `http://gered-store-back.lndo.site/smartphones/${item.brand}_${item.nameProduct.split(" ")[0]}${item.nameProduct.split(" ")[1] ? "_" + item.nameProduct.split(" ")[1] : ""}TelUpSide.jpg`,
+      `http://gered-store-back.lndo.site/smartphones/${item.brand}_${item.nameProduct.split(" ").join("_")}Tel2.jpg`,
+      `http://gered-store-back.lndo.site/smartphones/${item.brand}_${item.nameProduct.split(" ").join("_")}TelFront.jpg`,
+      `http://gered-store-back.lndo.site/smartphones/${item.brand}_${item.nameProduct.split(" ").join("_")}TelLeftSide.jpg`,
+      `http://gered-store-back.lndo.site/smartphones/${item.brand}_${item.nameProduct.split(" ").join("_")}TelRightSide.jpg`,
+      `http://gered-store-back.lndo.site/smartphones/${item.brand}_${item.nameProduct.split(" ").join("_")}TelSide.jpg`,
+      `http://gered-store-back.lndo.site/smartphones/${item.brand}_${item.nameProduct.split(" ").join("_")}TelUpSide.jpg`,
     ];
     return images;
   },
@@ -22,8 +22,9 @@ export const imagesService = {
     Array.from(images).forEach((file) => {
       imagesFormData.append("images[]", file);
     });
+    imagesFormData.append("id", id);
     const response = await kyApi
-      .post(`products/update?id=${id}`, {
+      .post(`products/update`, {
         body: imagesFormData,
       })
       .text();

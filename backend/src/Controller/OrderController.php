@@ -35,6 +35,7 @@ class OrderController extends Controller
             [
                 'create' => 'createOrder',
                 'me' => 'getUserOrders',
+                'all' => 'getAllOrders',
             ]
         );
         $this->basketId = $formData['id'] ?? null;
@@ -83,6 +84,16 @@ class OrderController extends Controller
             return $this->notFoundResponse();
         }
         $result = $this->tableGateway->findByUserId($user['id']);
+        $response['status_code_header'] = 200;
+        $response['body'] = json_encode(
+            $result
+        );
+        return $response;
+    }
+
+    private function getAllOrders()
+    {
+        $result = $this->tableGateway->findAll();
         $response['status_code_header'] = 200;
         $response['body'] = json_encode(
             $result

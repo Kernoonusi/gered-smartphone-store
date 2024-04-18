@@ -95,10 +95,12 @@ class ProductsController extends Controller
                 }
                 break;
             case 'PUT':
-                $response = $this->updateProduct($this->productId);
+                $response = $this->updateProduct();
                 break;
             case 'DELETE':
-                $response = $this->deleteProduct($this->productId);
+                if ($this->route != "") {
+                    $response = call_user_func([$this, $this->routeActions[$this->route]]);
+                }
                 break;
             default:
                 $response = $this->notFoundResponse();
@@ -233,9 +235,10 @@ class ProductsController extends Controller
         return $response;
     }
 
-    private function updateProduct($id)
+    private function updateProduct()
     {
-        if ($_POST["nameProduct"] == "" && $_FILES['images']['tmp_name']) {
+        $id = $_POST["id"];
+        if (!isset($_POST["nameProduct"]) && $_FILES['images']['tmp_name']) {
             $images = $_FILES['images'];
             $targetDirectory = APP_PATH . '/public/smartphones/';
             $view_of_image = ["", "2", "Front", "LeftSide", "RightSide", "Side", "UpSide"];
@@ -245,7 +248,7 @@ class ProductsController extends Controller
                 if ($tmpName == '') {
                     continue;
                 }
-                $targetFile = $targetDirectory . $product["brand"] . '_' . implode('_', explode(' ', $product["nameProduct"])) . "Tel" . $view_of_image[$i] . ".jpg";
+                $targetFile = $targetDirectory . $product["brand"] . '_' . str_replace(' ', '_', $product["nameProduct"]) . "Tel" . $view_of_image[$i] . ".jpg";
                 // $imageFileType = strtolower(pathinfo($targetFile, PATHINFO_EXTENSION));
                 if (!getimagesize($tmpName)) {
                     $result = "Файл " . htmlspecialchars(basename($images['name'][$key])) . " не является изображением.\n";
@@ -269,6 +272,14 @@ class ProductsController extends Controller
                 }
                 $i++;
             }
+            $result = "Файл " . htmlspecialchars(basename($images['name'][$key])) . " успешно загружен.\n";
+            $response['status_code_header'] = 200;
+            $response['body'] = json_encode(
+                [
+                    'message' => $result,
+                ]
+            );
+            return $response;
         } else {
             $input = [
                 "nameProduct" => $_POST["nameProduct"],
@@ -286,15 +297,16 @@ class ProductsController extends Controller
             if (!$this->validate($input)) {
                 return $this->unprocessableEntityResponse();
             }
-            $this->tableGateway->update($input, $id);
+            $this->tableGateway->update($id, $input);
             $response['status_code_header'] = 200;
             $response['body'] = null;
             return $response;
         }
     }
 
-    private function deleteProduct($id)
+    private function deleteProduct()
     {
+        $id = $_POST["id"];
         $result = $this->tableGateway->find($id);
         if (!$result) {
             return $this->notFoundResponse();

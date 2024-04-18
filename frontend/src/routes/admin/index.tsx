@@ -22,7 +22,7 @@ export const Route = createFileRoute("/admin/")({
     }
   },
   loader: async () => {
-    const products = productsService.getProducts(20);
+    const products = productsService.getProducts(2000);
     return { products: defer(products) };
   },
   component: Index,
@@ -30,6 +30,11 @@ export const Route = createFileRoute("/admin/")({
 
 export function Index() {
   const { products } = Route.useLoaderData();
+  const onDelete = (id: number) => {
+    productsService.deleteProduct(id.toString()).then(() => {
+      console.log("deleted");
+    });
+  };
   return (
     <main className="w-full md:w-10/12 mt-6 flex flex-col gap-12 mx-auto">
       <Tabs defaultValue="products">
@@ -75,7 +80,10 @@ export function Index() {
                         <TableCell>{product.releaseYear}</TableCell>
                         <TableCell>{product.count}</TableCell>
                         <TableCell className="flex gap-2">
-                          <Button variant="destructive" size={"icon"}>
+                          <Button
+                            variant="destructive"
+                            onClick={() => onDelete(product.id)}
+                            size={"icon"}>
                             <Trash />
                           </Button>
                           <EditForm product={product} />
@@ -91,6 +99,25 @@ export function Index() {
             <AddForm />
           </div>
         </TabsContent>
+        <TabsContent value="orders">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Id</TableHead>
+                <TableHead>Email</TableHead>
+                <TableHead>Имя</TableHead>
+                <TableHead>Статус</TableHead>
+                <TableHead>Комментарии</TableHead>
+                <TableHead>Товары</TableHead>
+                <TableHead>Количество</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+
+            </TableBody>
+          </Table>
+        </TabsContent>
+        <TabsContent value="users"></TabsContent>
       </Tabs>
     </main>
   );

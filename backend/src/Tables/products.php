@@ -68,8 +68,8 @@ class Products extends Table
 
     public function find($id)
     {
-        $sql = "SELECT * FROM $this->t WHERE id = $id";
-        return $this->fetchOne($sql);
+        $sql = "SELECT * FROM $this->t WHERE id = :id";
+        return $this->fetchOne($sql, ['id' => $id]);
     }
 
     public function findAllFilters()
@@ -113,10 +113,11 @@ class Products extends Table
     public function update($id, $data)
     {
         $sql = "UPDATE $this->t SET 
-        name = :name, price = :price, description = :description,
-        ram = :ram, storage = :storage, soc = :soc,
-        weight = :weight, size = :size, brand = :brand,
-        releaseYear = :releaseYear, count = :count WHERE id = :id";
+        nameProduct = :nameProduct, price = :price, 
+        description = :description, ram = :ram, 
+        storage = :storage, soc = :soc, weight = :weight, 
+        size = :size, brand = :brand, releaseYear = :releaseYear, 
+        count = :count WHERE id = :id";
         $this->execute($sql, [
             'nameProduct' => $data['nameProduct'],
             'price' => $data['price'],

@@ -11,31 +11,31 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useTransition } from "react";
 import { imagesService } from "@/services/images.service";
 import { ImageEdit } from "./image-edit";
+import { productsService } from "@/services/products.service";
 
-
-const editProductSchema = z.object({
+export const editProductSchema = z.object({
   id: z.number(),
   nameProduct: z.string().min(1, { message: "Название обязательно для заполнения" }),
-  price: z
+  price: z.coerce
     .number({ invalid_type_error: "Цена обязательна для заполнения" })
     .min(1, { message: "Цена обязательна для заполнения" }),
   description: z.string().min(1, { message: "Описание обязательно для заполнения" }),
-  ram: z
+  ram: z.coerce
     .number({ invalid_type_error: "Объем ОЗУ обязателен для заполнения" })
     .min(1, { message: "Объем ОЗУ обязателен для заполнения" }),
-  storage: z
+  storage: z.coerce
     .number({ invalid_type_error: "Объем хранилища обязателен для заполнения" })
     .min(1, { message: "Объем хранилища обязателен для заполнения" }),
-  size: z.string().min(1, { message: "Размер обязателен для заполнения" }),
+  size: z.coerce.number().min(1, { message: "Размер обязателен для заполнения" }),
   brand: z.string().min(1, { message: "Бренд обязателен для заполнения" }),
   soc: z.string().min(1, { message: "SOC обязателен для заполнения" }),
-  weight: z
+  weight: z.coerce
     .number({ invalid_type_error: "Вес обязателен для заполнения" })
     .min(1, { message: "Вес обязателен для заполнения" }),
-  releaseYear: z
+  releaseYear: z.coerce
     .number({ invalid_type_error: "Год выпуска обязателен для заполнения" })
     .min(1, { message: "Год выпуска обязателен для заполнения" }),
-  count: z.number().min(1, { message: "Количество обязательно для заполнения" }),
+  count: z.coerce.number().min(1, { message: "Количество обязательно для заполнения" }),
 });
 
 export function EditForm({ product }: { product: IProduct }) {
@@ -50,7 +50,7 @@ export function EditForm({ product }: { product: IProduct }) {
       description: product.description,
       ram: product.ram,
       storage: product.storage,
-      size: product.size,
+      size: +product.size,
       brand: product.brand,
       soc: product.soc,
       weight: product.weight,
@@ -59,9 +59,10 @@ export function EditForm({ product }: { product: IProduct }) {
     },
   });
   function onEditFormSubmit(data: z.infer<typeof editProductSchema>) {
-    
     startTransition(() => {
-      console.log(data);
+      productsService.updateProduct(data).then((res) => {
+        console.log(res);
+      });
     });
   }
   return (
@@ -71,7 +72,7 @@ export function EditForm({ product }: { product: IProduct }) {
           <PencilLine />
         </Button>
       </DialogTrigger>
-      <DialogContent>
+      <DialogContent className="lg:max-w-3xl">
         <DialogHeader>
           <DialogTitle>Редактирование</DialogTitle>
         </DialogHeader>
@@ -99,7 +100,7 @@ export function EditForm({ product }: { product: IProduct }) {
                 <FormItem>
                   <FormLabel>Название</FormLabel>
                   <FormControl>
-                    <Input {...field} defaultValue={product.nameProduct} />
+                    <Input {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -112,7 +113,7 @@ export function EditForm({ product }: { product: IProduct }) {
                 <FormItem>
                   <FormLabel>Цена</FormLabel>
                   <FormControl>
-                    <Input {...field} defaultValue={product.price} />
+                    <Input type="number" min={1} step="any" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -125,7 +126,7 @@ export function EditForm({ product }: { product: IProduct }) {
                 <FormItem>
                   <FormLabel>Оперативная память</FormLabel>
                   <FormControl>
-                    <Input {...field} defaultValue={product.ram} />
+                    <Input type="number" min={2} step={2} max={24} {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -138,7 +139,7 @@ export function EditForm({ product }: { product: IProduct }) {
                 <FormItem>
                   <FormLabel>Встроенная память</FormLabel>
                   <FormControl>
-                    <Input {...field} defaultValue={product.storage} />
+                    <Input type="number" min={64} step={64} max={2048} {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -151,7 +152,7 @@ export function EditForm({ product }: { product: IProduct }) {
                 <FormItem>
                   <FormLabel>Диагональ экрана</FormLabel>
                   <FormControl>
-                    <Input {...field} defaultValue={product.size} />
+                    <Input type="number" min={5} step={0.1} max={7} {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -164,7 +165,7 @@ export function EditForm({ product }: { product: IProduct }) {
                 <FormItem>
                   <FormLabel>SOC</FormLabel>
                   <FormControl>
-                    <Input {...field} defaultValue={product.soc} />
+                    <Input {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -177,7 +178,7 @@ export function EditForm({ product }: { product: IProduct }) {
                 <FormItem>
                   <FormLabel>Бренд</FormLabel>
                   <FormControl>
-                    <Input {...field} defaultValue={product.brand} />
+                    <Input {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -190,7 +191,7 @@ export function EditForm({ product }: { product: IProduct }) {
                 <FormItem>
                   <FormLabel>Год выпуска</FormLabel>
                   <FormControl>
-                    <Input {...field} defaultValue={product.releaseYear} />
+                    <Input {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -203,7 +204,7 @@ export function EditForm({ product }: { product: IProduct }) {
                 <FormItem>
                   <FormLabel>Вес</FormLabel>
                   <FormControl>
-                    <Input {...field} defaultValue={product.weight} />
+                    <Input type="number" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -216,7 +217,7 @@ export function EditForm({ product }: { product: IProduct }) {
                 <FormItem>
                   <FormLabel>Количество</FormLabel>
                   <FormControl>
-                    <Input {...field} defaultValue={product.count} />
+                    <Input type="number" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -243,7 +244,7 @@ export function EditForm({ product }: { product: IProduct }) {
                 </FormItem>
               )}
             />
-            <Button type="submit" disabled={isPending} className="col-span-4 mx-auto w-fit">
+            <Button type="submit" disabled={isPending} className="col-span-3 mx-auto w-fit">
               {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
               Сохранить
             </Button>

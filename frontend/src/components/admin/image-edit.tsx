@@ -14,7 +14,6 @@ const ALLOWED_IMAGE_TYPES = ["image/jpeg", "image/png", "image/webp", "image/jpg
 const imageEditSchema = z.object({
   images: z
     .custom<FileList>((val) => val instanceof FileList, "Required")
-    .refine((files) => files.length > 0, `Нужно выбрать хотя бы 7 изображение`)
     .refine((files) => files.length == 7, `Нужно выбрать 7 изображений`)
     .refine(
       (files) => Array.from(files).every((file) => file.size <= MAX_IMAGE_SIZE),
@@ -37,7 +36,10 @@ export function ImageEdit({ id }: { id: number }) {
   const onSubmit = (data: z.infer<typeof imageEditSchema>) => {
     console.log(data);
     startTransition(() => {
-      imagesService.updateAllPhotos({ images: data.images, id: id.toString() });
+      imagesService.updateAllPhotos({ images: data.images, id: id.toString() }).then(() => {
+        setError(undefined);
+        setSuccess("Изображения обновлены");
+      });
     });
   };
   const formRef: MutableRefObject<HTMLFormElement | null> = useRef(null);
@@ -66,7 +68,7 @@ export function ImageEdit({ id }: { id: number }) {
                       ) : error ? (
                         <AlertTriangle size={48} className="transition text-primary" />
                       ) : (
-                        <PencilLine size={48} className="transition text-primary" />
+                        <PencilLine className="transition text-primary" />
                       )}
                     </label>
                     <Input
@@ -95,7 +97,7 @@ export function ImageEdit({ id }: { id: number }) {
                         // Validate and update uploaded file
                         const newFiles = dataTransfer.files;
                         onChange(newFiles);
-                        formRef.current?.requestSubmit();
+                        form.handleSubmit(onSubmit)();
                       }}
                     />
                   </div>

@@ -65,13 +65,13 @@ export function Index() {
   const [isPending, startTransition] = useTransition();
 
   const formSchema = z.object({
-    minPrice: z.number().min(Math.floor(filters.minPrice)).max(Math.round(filters.maxPrice)),
-    maxPrice: z.number().min(Math.floor(filters.minPrice)).max(Math.round(filters.maxPrice)),
+    minPrice: z.coerce.number().min(Math.floor(filters.minPrice)).max(Math.round(filters.maxPrice)),
+    maxPrice: z.coerce.number().min(Math.floor(filters.minPrice)).max(Math.round(filters.maxPrice)),
     brand: z.array(z.object({ value: z.string(), label: z.string() })),
-    ram: z.array(z.number().min(filters.minRam).max(filters.maxRam)),
-    storage: z.array(z.number().min(filters.minStorage).max(filters.maxStorage)),
-    size: z.array(z.number().min(filters.minSize).max(filters.maxSize)),
-    weight: z.array(z.number().min(0).max(1000000)),
+    ram: z.array(z.coerce.number().min(filters.minRam).max(filters.maxRam)),
+    storage: z.array(z.coerce.number().min(filters.minStorage).max(filters.maxStorage)),
+    size: z.array(z.coerce.number().min(filters.minSize).max(filters.maxSize)),
+    weight: z.array(z.coerce.number().min(0).max(1000000)),
   });
 
   const form = useForm<z.infer<typeof formSchema>>({

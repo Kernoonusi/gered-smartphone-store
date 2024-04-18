@@ -36,7 +36,7 @@ export const addProductSchema = z.object({
   storage: z.coerce
     .number({ invalid_type_error: "Объем хранилища обязателен для заполнения" })
     .min(1, { message: "Объем хранилища обязателен для заполнения" }),
-  size: z.coerce.string().min(1, { message: "Размер обязателен для заполнения" }),
+  size: z.coerce.number().min(1, { message: "Размер обязателен для заполнения" }),
   brand: z.string().min(1, { message: "Бренд обязателен для заполнения" }),
   soc: z.string().min(1, { message: "SOC обязателен для заполнения" }),
   weight: z.coerce
@@ -71,7 +71,7 @@ export function AddForm() {
       description: "",
       ram: 0,
       storage: 0,
-      size: "",
+      size: 0,
       brand: "",
       soc: "",
       weight: 0,
