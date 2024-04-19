@@ -22,9 +22,33 @@ import { Route as ProductsProductIdImport } from './routes/products/$productId'
 
 // Create Virtual Routes
 
+const WarrantyLazyImport = createFileRoute('/warranty')()
+const PolicyLazyImport = createFileRoute('/policy')()
+const DeliveryLazyImport = createFileRoute('/delivery')()
+const ContactsLazyImport = createFileRoute('/contacts')()
 const AboutLazyImport = createFileRoute('/about')()
 
 // Create/Update Routes
+
+const WarrantyLazyRoute = WarrantyLazyImport.update({
+  path: '/warranty',
+  getParentRoute: () => rootRoute,
+} as any).lazy(() => import('./routes/warranty.lazy').then((d) => d.Route))
+
+const PolicyLazyRoute = PolicyLazyImport.update({
+  path: '/policy',
+  getParentRoute: () => rootRoute,
+} as any).lazy(() => import('./routes/policy.lazy').then((d) => d.Route))
+
+const DeliveryLazyRoute = DeliveryLazyImport.update({
+  path: '/delivery',
+  getParentRoute: () => rootRoute,
+} as any).lazy(() => import('./routes/delivery.lazy').then((d) => d.Route))
+
+const ContactsLazyRoute = ContactsLazyImport.update({
+  path: '/contacts',
+  getParentRoute: () => rootRoute,
+} as any).lazy(() => import('./routes/contacts.lazy').then((d) => d.Route))
 
 const AboutLazyRoute = AboutLazyImport.update({
   path: '/about',
@@ -73,6 +97,22 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AboutLazyImport
       parentRoute: typeof rootRoute
     }
+    '/contacts': {
+      preLoaderRoute: typeof ContactsLazyImport
+      parentRoute: typeof rootRoute
+    }
+    '/delivery': {
+      preLoaderRoute: typeof DeliveryLazyImport
+      parentRoute: typeof rootRoute
+    }
+    '/policy': {
+      preLoaderRoute: typeof PolicyLazyImport
+      parentRoute: typeof rootRoute
+    }
+    '/warranty': {
+      preLoaderRoute: typeof WarrantyLazyImport
+      parentRoute: typeof rootRoute
+    }
     '/products/$productId': {
       preLoaderRoute: typeof ProductsProductIdImport
       parentRoute: typeof rootRoute
@@ -101,6 +141,10 @@ declare module '@tanstack/react-router' {
 export const routeTree = rootRoute.addChildren([
   IndexRoute,
   AboutLazyRoute,
+  ContactsLazyRoute,
+  DeliveryLazyRoute,
+  PolicyLazyRoute,
+  WarrantyLazyRoute,
   ProductsProductIdRoute,
   AdminIndexRoute,
   CartIndexRoute,

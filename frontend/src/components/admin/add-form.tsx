@@ -10,6 +10,7 @@ import { Loader2, Plus } from "lucide-react";
 import { useTransition } from "react";
 import { productsService } from "@/services/products.service";
 import { HTTPError } from "ky";
+import { useRouter } from "@tanstack/react-router";
 
 // function checkFileType(file: File) {
 //   if (file?.name) {
@@ -62,6 +63,7 @@ export const addProductSchema = z.object({
 
 export function AddForm() {
   const [isPending, startTransition] = useTransition();
+  const router = useRouter();
   const addForm = useForm<z.infer<typeof addProductSchema>>({
     resolver: zodResolver(addProductSchema),
     defaultValues: {
@@ -84,6 +86,7 @@ export function AddForm() {
     startTransition(() => {
       try {
         productsService.addProduct(values).then((res) => console.log(res));
+        router.invalidate();
       } catch (error) {
         if (error instanceof HTTPError) {
           error.response.text().then((text) => {

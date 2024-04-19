@@ -33,6 +33,10 @@ class UsersController extends Controller
                 'create' => 'createUserFromRequest',
                 'me' => 'getUser',
                 'admin' => 'isAdminByEmail',
+                'getAll' => 'getAllUsers',
+                'delete' => 'deleteUser',
+                'updateRole' => 'updateRole',
+                'update' => 'updateUserFromRequest',
             ]
         );
         $this->tableGateway = new Users($db);
@@ -94,7 +98,19 @@ class UsersController extends Controller
         return $response;
     }
 
-    private function isAdminByEmail(){
+    private function getAllUsers()
+    {
+        $result = $this->tableGateway->findAll();
+        if (!$result) {
+            return $this->notFoundResponse();
+        }
+        $response['status_code_header'] = 200;
+        $response['body'] = json_encode($result);
+        return $response;
+    }
+
+    private function isAdminByEmail()
+    {
         $token = explode(' ', $this->headers['Authorization'])[1];
         $decoded = $this->validateToken($token);
         if (!$decoded) {
@@ -130,21 +146,66 @@ class UsersController extends Controller
         return $response;
     }
 
-    private function updateUserFromRequest($id)
+    private function updateRole()
     {
         $input = (array) json_decode(file_get_contents('php://input'), TRUE);
-        if (!$this->validate($input)) {
-            return $this->unprocessableEntityResponse();
-        }
-        $this->tableGateway->update($input, $id);
-        $updatedUser = $this->tableGateway->find($id);
-        $jwt = $this->jwtEncode($updatedUser);
+        $this->tableGateway->updateRole($input['role_id'], $input['id']);
         $response['status_code_header'] = 200;
         $response['body'] = json_encode(
             array(
-                "message" => "Success update user",
-                "jwt" => $jwt
+                "message" => "Успешное обновление роли",
             )
+        );
+        return $response;
+    }
+
+    private function updateUserFromRequest()
+    {
+        $id = "";
+        $input = (array) json_decode(file_get_contents('php://input'), TRUE);
+        if (isset($this->headers['Authorization']) ) {
+            $token = explode(' ', $this->headers['Authorization'])[1];
+            $decoded = $this->validateToken($token);
+            if (!$decoded) {
+                return $this->unprocessableEntityResponse();
+            }
+            $result = $this->tableGateway->findByEmail($decoded['data']->email);
+            if (!$result) {
+                return $this->notFoundResponse();
+            }
+            $input['id'] = $result['id'];
+            $id = $input['id'];
+        } else if (isset($input['email'])) {
+            $result = $this->tableGateway->findByEmail($input['email']);
+            if (!$result) {
+                return $this->notFoundResponse();
+            }
+            $input['id'] = $result['id'];
+            $id = $input['id'];
+        }
+        $this->tableGateway->update($input, $id);
+        if (isset($this->headers['Authorization'])) {
+            $updatedUser = $this->tableGateway->find($id);
+            $jwt = $this->jwtEncode($updatedUser);
+        }
+        $response['status_code_header'] = 200;
+        $result = ["message" => "Success update user"];
+        if (isset($jwt)) {
+            $result['jwt'] = $jwt;
+        }
+        $response['body'] = json_encode($result);
+        return $response;
+    }
+
+    private function deleteUser()
+    {
+        $input = (array) json_decode(file_get_contents('php://input'), TRUE);
+        $this->tableGateway->delete($input['id']);
+        $response['status_code_header'] = 204;
+        $response['body'] = json_encode(
+            [
+                "message" => "Успешное удаление пользователя"
+            ]
         );
         return $response;
     }

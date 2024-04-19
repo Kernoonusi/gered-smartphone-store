@@ -10,6 +10,7 @@ class Orders extends Table
     private $t1 = 'order_products';
     private $t2 = 'products';
     private $t3 = 'statuses';
+    private $t4 = 'users';
 
     public function __construct(private $db)
     {
@@ -67,20 +68,26 @@ class Orders extends Table
 
     public function findAll()
     {
-        $sql = "SELECT o.id, s.name as status, o.note,
-        GROUP_CONCAT(op.product_id SEPARATOR ';') as ids,
+        $sql = "SELECT o.id, s.name as status, o.note, u.email, u.name,
         GROUP_CONCAT(op.quantity SEPARATOR ';') as quantities,
-        GROUP_CONCAT(p.nameProduct SEPARATOR ';') as nameProducts,
-        GROUP_CONCAT(p.price SEPARATOR ';') as prices,
-        SUM(p.price * op.quantity) as total
+        GROUP_CONCAT(p.nameProduct SEPARATOR ';') as nameProducts
         FROM $this->t as o
-        INNER JOIN $this->t1 as op
-        INNER JOIN $this->t2 as p
-        INNER JOIN $this->t3 as s
-        ON o.id = op.order_id
-        AND op.product_id = p.id
-        AND o.status_id = s.id
+        INNER JOIN $this->t1 as op ON o.id = op.order_id
+        INNER JOIN $this->t2 as p ON op.product_id = p.id
+        INNER JOIN $this->t3 as s ON o.status_id = s.id
+        INNER JOIN $this->t4 as u ON o.user_id = u.id
         GROUP BY o.id";
         return $this->fetchAll($sql);
+    }
+
+    public function delete(int $id)
+    {
+        $sql = "DELETE FROM $this->t WHERE id = :id";
+        $this->execute($sql, ['id' => $id]);
+    }
+
+    public function updateStatus(string $status, int $id){
+        $sql = "UPDATE $this->t SET status_id = :status WHERE id = :id";
+        $this->execute($sql, ['status' => $status, 'id' => $id]);
     }
 }

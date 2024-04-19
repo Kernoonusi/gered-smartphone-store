@@ -11,7 +11,7 @@ export function ProductCard({ item }: { item: IProduct }) {
     cartService.addToCart(item);
   };
   return (
-    <Card className="flex flex-col justify-between">
+    <Card className="flex flex-col justify-between min-w-fit">
       <CardHeader>
         <Link to={`/products/$productId`} params={{ productId: item.id.toString() }}>
           <img src={imagesService.getFrontImage(item)} alt="" />

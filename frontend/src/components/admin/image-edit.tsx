@@ -6,6 +6,7 @@ import { MutableRefObject, useRef, useState, useTransition } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { imagesService } from "@/services/images.service";
+import { useRouter } from "@tanstack/react-router";
 
 // Images
 const MAX_IMAGE_SIZE = 5242880; // 5 MB
@@ -29,6 +30,7 @@ export function ImageEdit({ id }: { id: number }) {
   const [error, setError] = useState<string | undefined>();
   const [success, setSuccess] = useState<string | undefined>();
   const [isPending, startTransition] = useTransition();
+  const router = useRouter();
 
   const form = useForm<z.infer<typeof imageEditSchema>>({
     resolver: zodResolver(imageEditSchema),
@@ -39,6 +41,7 @@ export function ImageEdit({ id }: { id: number }) {
       imagesService.updateAllPhotos({ images: data.images, id: id.toString() }).then(() => {
         setError(undefined);
         setSuccess("Изображения обновлены");
+        router.invalidate();
       });
     });
   };

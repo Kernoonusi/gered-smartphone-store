@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { cartService } from "@/services/cart.service";
+import { imagesService } from "@/services/images.service";
 import { productsService } from "@/services/products.service";
 import { ICartItem } from "@/types";
 import { Await, createFileRoute, defer } from "@tanstack/react-router";
@@ -57,14 +58,14 @@ function Index() {
           </p>
         </div>
       )}
-      <div className="flex justify-between gap-4">
+      <div className="flex flex-col lg:flex-row justify-between gap-4">
         <article className="flex flex-col gap-4">
           {cart === undefined || cart.length === 0? (
             <p className="text-3xl">Ваша корзина пока пуста</p>
           ) : (
             cart.map((item) => (
-              <div key={item.id} className="grid grid-cols-4 grid-rows-3 gap-2">
-                <img src="http://gered-store-back.lndo.site/smartphones/xiaomiTel.jpg" alt="" className="h-24 w-auto row-span-3" />
+              <div key={item.id} className="grid grid-cols-4 lg:grid-rows-3 gap-2">
+                <img src={imagesService.getFrontImage(item)} alt="" className="h-10/12 mx-auto w-auto row-span-2 lg:row-span-3" />
                 <p className="row-span-1">
                   {item.brand} {item.nameProduct}
                 </p>
@@ -140,7 +141,7 @@ function Index() {
         </Card>)}
       </div>
       <h2>Рекомендуем</h2>
-      <article className="grid grid-cols-5 gap-4">
+      <article className="w-full overflow-x-scroll md:overflow-hidden col-span-3 row-span-1 grid grid-cols-[repeat(5,minmax(200px,1fr))] gap-4">
         <Suspense fallback={<div></div>}>
           <Await promise={products}>
             {(data) => {

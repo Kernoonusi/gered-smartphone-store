@@ -49,32 +49,27 @@ export const Header = () => {
   return (
     <>
       <header className="overflow-hidden">
-        <div className="w-screen overflow-hidden flex flex-col items-center">
-          <div className="w-10/12 grid grid-cols-[auto_auto_auto_auto_auto_1fr_auto] grid-rows-1 gap-2">
+        <div className="w-screen hidden overflow-hidden md:flex flex-col items-center">
+          <div className="w-10/12 hidden md:grid grid-cols-[auto_auto_auto_auto_1fr_auto] grid-rows-1 gap-2">
             <Link
               to="/about"
               className="transition-all text-sm p-2 h-full border-b border-black border-opacity-0 hover:border-opacity-100">
               О компании
             </Link>
             <Link
-              to="/"
+              to="/delivery"
               className="transition-all text-sm p-2 h-full border-b border-black border-opacity-0 hover:border-opacity-100">
               Доставка
             </Link>
             <Link
-              to="/"
+              to="/warranty"
               className="transition-all text-sm p-2 h-full border-b border-black border-opacity-0 hover:border-opacity-100">
               Гарантия
             </Link>
             <Link
-              to="/"
+              to="/contacts"
               className="transition-all text-sm p-2 h-full border-b border-black border-opacity-0 hover:border-opacity-100">
               Контакты
-            </Link>
-            <Link
-              to="/"
-              className="transition-all text-sm p-2 h-full border-b border-black border-opacity-0 hover:border-opacity-100">
-              Доставка
             </Link>
             <div />
             <div className="flex gap-4">
@@ -105,34 +100,38 @@ export const Header = () => {
         </div>
       </header>
       <nav className="overflow-hidden sticky top-0 z-50">
-        <div className="w-screen overflow-hidden transition-all flex justify-center sticky top-0 bg-fuchsia-900">
-          <Link to="/" className="anim-elem w-fit transition-all text-3xl p-2 h-full text-cyan-300">
+        <div className="w-screen overflow-hidden transition-all flex gap-4 md:gap-1 justify-center top-0 bg-fuchsia-900">
+          <Link
+            to="/"
+            className="md:anim-elem md:flex w-fit transition-all text-3xl p-2 h-full text-cyan-300">
             G
           </Link>
           <Link to="/products">
-            <Button variant={"ghost"} className="rounded-none text-white text-2xl py-7 mr-10">
+            <Button variant={"ghost"} className="rounded-none text-white text-2xl py-7 md:mr-10">
               Все смартфоны
             </Button>
           </Link>
-          {brands.length == 0 ? (
-            <SkeletonBrands />
-          ) : (
-            brands.map(({ brand }) => (
-              <Button
-                variant={"ghost"}
-                className="rounded-none text-gray-300 text-2xl py-7"
-                key={brand}
-                asChild>
-                <Link to="/products" search={{ brandSearch: brand }}>
-                  {brand}
-                </Link>
-              </Button>
-            ))
-          )}
-          <div className="anim-elem ml-10 text-white">
+          <div className="flex">
+            {brands.length == 0 ? (
+              <SkeletonBrands />
+            ) : (
+              brands.map(({ brand }) => (
+                <Button
+                  variant={"ghost"}
+                  className="rounded-none hidden lg:flex text-gray-300 even:hidden xl:even:flex text-2xl xl:text-xl 2xl:text-2xl py-7"
+                  key={brand}
+                  asChild>
+                  <Link to="/products" search={{ brandSearch: brand }}>
+                    {brand}
+                  </Link>
+                </Button>
+              ))
+            )}
+          </div>
+          <div className="md:anim-elem md:ml-10 text-white">
             <Link to="/cart">
               <Button variant="ghost" className="h-full rounded-none gap-4">
-                Корзина
+                <p className="hidden md:block">Корзина</p>
                 <ShoppingCart />
               </Button>
             </Link>

@@ -16,14 +16,14 @@ export function ProfileButton({ rounded }: { rounded?: boolean }) {
           variant="ghost"
           onClick={() => navigate({ to: "/profile" })}
           className={`h-full gap-4 ${rounded ? "" : "rounded-none"}`}>
-          {user.name}
+          <p className="hidden md:block">{user.name}</p>
           <User />
         </Button>
       ) : (
         <Dialog>
           <DialogTrigger>
             <Button variant="ghost" className={`h-full gap-4 ${rounded ? "" : "rounded-none"}`}>
-              Войти
+              <p className="hidden md:block">Войти</p>
               <User />
             </Button>
           </DialogTrigger>

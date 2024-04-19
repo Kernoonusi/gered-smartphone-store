@@ -12,9 +12,14 @@ interface IOrderProfileData {
   total: number;
 }
 
-interface IOrderWithProfile extends Omit<IOrderProfileData, "total" | "prices"> {
+interface IOrderWithProfile {
+  id: number;
+  status: string;
+  note?: string;
   email: string;
   name: string;
+  quantities: string;
+  nameProducts: string;
 }
 
 export const orderService = {
@@ -55,33 +60,33 @@ export const orderService = {
       };
     });
     console.log(preparedOrders);
-    
+
     return preparedOrders;
   },
   getAllOrders: async () => {
-    const response = await kyApi.get("order/all", {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem("jwt")}`,
-      },
-    });
-    const orders: IOrderWithProfile[] = await response.json();
-    const preparedOrders: IOrderWithProfile[] = orders.map((order) => {
-      const productIds = order.ids.split(";");
-      const quantities = order.quantities.split(";");
-      const nameProducts = order.nameProducts.split(";");
-      const products: IOrderWithProfile["products"] = productIds.map((id, index) => ({
-        id: Number(id),
-        name: nameProducts[index],
-        count: Number(quantities[index]),
-      }));
-      return {
-        status: order.status,
-        note: order.note,
-        products,
-        total: Number(order.total),
-      };
-    });
-    console.log(preparedOrders);
-    return preparedOrders;
+    const response: IOrderWithProfile[] = await kyApi.get("order/all", {}).json();
+    return response;
+  },
+  updateOrderStatus: async (id: number, status: string) => {
+    const response: { message: string } = await kyApi
+      .post("order/updateStatus", {
+        json: {
+          id,
+          status_id: status,
+        },
+      })
+      .json();
+
+    return response;
+  },
+  deleteOrder: async (id: number) => {
+    const response = await kyApi
+      .post("order/delete", {
+        json: {
+          id,
+        },
+      })
+      .json();
+    return response;
   },
 };

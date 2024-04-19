@@ -22,7 +22,7 @@ export function Index() {
   const images = imagesService.getAllSmartPhoneImages(product);
   return (
     <main className="w-full md:w-10/12 mt-6 flex flex-col gap-12 mx-auto">
-      <header className="grid grid-cols-[auto_auto_auto_auto] grid-rows-[auto_auto]">
+      <header className="grid grid-cols-[auto_1fr] gap-4 md:gap-1 md:grid-cols-[auto_auto_auto_auto] md:grid-rows-[auto_auto]">
         <div className="row-span-2 flex flex-col gap-2">
           {images.map((image, index) => (
             <img
@@ -49,7 +49,7 @@ export function Index() {
           Смартфон {product.brand} {product.nameProduct} {product.ram}гб + {product.storage}гб
         </p>
         <div />
-        <div className="flex flex-col justify-between bg-slate-200 rounded-3xl p-6">
+        <div className="flex flex-col col-span-2 md:col-span-1 justify-between bg-slate-200 rounded-3xl p-6">
           <p className="text-4xl font-semibold">{product.price}₽</p>
           <p>в наличии: {product.count}</p>
           <Button

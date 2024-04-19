@@ -12,6 +12,7 @@ import { useTransition } from "react";
 import { imagesService } from "@/services/images.service";
 import { ImageEdit } from "./image-edit";
 import { productsService } from "@/services/products.service";
+import { useRouter } from "@tanstack/react-router";
 
 export const editProductSchema = z.object({
   id: z.number(),
@@ -41,6 +42,7 @@ export const editProductSchema = z.object({
 export function EditForm({ product }: { product: IProduct }) {
   const [isPending, startTransition] = useTransition();
   const photos = imagesService.getAllSmartPhoneImages(product);
+  const router = useRouter();
   const editForm = useForm<z.infer<typeof editProductSchema>>({
     resolver: zodResolver(editProductSchema),
     defaultValues: {
@@ -62,6 +64,7 @@ export function EditForm({ product }: { product: IProduct }) {
     startTransition(() => {
       productsService.updateProduct(data).then((res) => {
         console.log(res);
+        router.invalidate();
       });
     });
   }

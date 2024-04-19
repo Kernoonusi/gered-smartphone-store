@@ -36,6 +36,8 @@ class OrderController extends Controller
                 'create' => 'createOrder',
                 'me' => 'getUserOrders',
                 'all' => 'getAllOrders',
+                "updateStatus" => "updateStatus",
+                "delete" => "deleteOrder"
             ]
         );
         $this->basketId = $formData['id'] ?? null;
@@ -122,6 +124,28 @@ class OrderController extends Controller
         $response['status_code_header'] = 200;
         $response['body'] = json_encode(
             ["message" => 'Заказ создан']
+        );
+        return $response;
+    }
+
+    private function updateStatus()
+    {
+        $input = (array) json_decode(file_get_contents('php://input'), TRUE);
+        $this->tableGateway->updateStatus($input['status_id'], $input['id']);
+        $response['status_code_header'] = 200;
+        $response['body'] = json_encode(
+            ["message" => 'Статус заказа обновлен']
+        );
+        return $response;
+    }
+
+    private function deleteOrder()
+    {
+        $input = (array) json_decode(file_get_contents('php://input'), TRUE);
+        $this->tableGateway->delete($input['id']);
+        $response['status_code_header'] = 200;
+        $response['body'] = json_encode(
+            ["message" => 'Заказ удален']
         );
         return $response;
     }

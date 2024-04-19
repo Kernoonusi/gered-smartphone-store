@@ -2,7 +2,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { useState, useTransition } from "react";
-import ky, { HTTPError } from "ky";
+import { HTTPError } from "ky";
 import { Loader2 } from "lucide-react";
 
 import { DialogHeader, DialogTitle } from "@shadcnUi/dialog";
@@ -20,6 +20,7 @@ import { Input } from "@shadcnUi/input";
 import { useAuthStore } from "@components/auth/auth-form";
 import { useUserStore } from "@components/stores/UserStore";
 import { useToast } from "@shadcnUi/use-toast";
+import { userService } from "@/services/user.service";
 
 const formSchema = z.object({
   email: z
@@ -48,10 +49,8 @@ export function LoginForm() {
   function onSubmit(values: z.infer<typeof formSchema>) {
     console.log(values);
     startTransition(() => {
-      ky.post("http://gered-store-back.lndo.site/users/login", {
-        json: values,
-      })
-        .json<{ message?: string; jwt?: string; error?: string }>()
+      userService
+        .login(values.email, values.password)
         .then((response: { message?: string; jwt?: string; error?: string }) => {
           if (response.jwt) {
             localStorage.setItem("jwt", response.jwt);

@@ -15,6 +15,12 @@ import { Slider2thumb } from "@/components/ui/slider2thumb";
 import { Loader2 } from "lucide-react";
 import { IProduct } from "@/types";
 import MultipleSelector, { Option } from "@/components/ui/multiple-selector";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 
 const searchSchema = z.object({
   brandSearch: z.string().optional(),
@@ -113,186 +119,193 @@ export function Index() {
     });
   }
   return (
-    <div className="w-full md:w-10/12 mt-6 grid grid-cols-[auto_1fr] grid-rows-[auto_1fr] gap-6 mx-auto">
+    <div className="w-full md:w-10/12 mt-6 flex flex-col lg:grid grid-cols-[auto_1fr] grid-rows-[auto_1fr] gap-6 mx-auto">
       <h2 className="text-3xl col-span-2">Товары</h2>
-      <Card className="pt-6 max-w-[240px] h-fit">
-        <CardContent>
-          <Form {...form}>
-            <form
-              name="filterForm"
-              id="filterForm"
-              onSubmit={form.handleSubmit(onSubmit)}
-              className="space-y-8">
-              <div className="grid grid-cols-2">
-                <FormLabel className="col-span-2 mb-3">Цена</FormLabel>
-                <FormField
-                  control={form.control}
-                  name="minPrice"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormControl>
-                        <Input
-                          {...field}
-                          className="rounded-r-none content"
-                          type="number"
-                          placeholder="От"
-                          min={Math.floor(filters.minPrice)}
-                          max={Math.round(filters.maxPrice)}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="maxPrice"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormControl>
-                        <Input
-                          {...field}
-                          className="rounded-l-none"
-                          type="number"
-                          placeholder="До"
-                          min={Math.floor(filters.minPrice)}
-                          max={Math.round(filters.maxPrice)}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-              <FormField
-                control={form.control}
-                name="brand"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Бренды</FormLabel>
-                    <FormControl>
-                      <div
-                        onFocus={() => setBrandIsOpen(true)}
-                        onBlur={() => setBrandIsOpen(false)}>
-                        <MultipleSelector
-                          onChange={field.onChange}
-                          value={field.value}
-                          defaultOptions={brands}
-                          emptyIndicator={
-                            <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">
-                              no results found.
-                            </p>
-                          }
-                        />
-                      </div>
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <div className={`transition-all h-${brandIsOpen ? "[250px]" : "0"}`} />
-              <FormField
-                control={form.control}
-                name="ram"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>
-                      Оперативная память <br /> {ram[0]}гб - {ram[1]}гб
-                    </FormLabel>
-                    <FormControl>
-                      <Slider2thumb
-                        onValueChange={(e) => {
-                          field.onChange(e), setRam(e);
-                        }}
-                        value={field.value}
-                        min={filters.minRam}
-                        max={filters.maxRam}
-                        step={1}
+      <Accordion type="single" defaultValue="item-1" collapsible>
+        <AccordionItem value="item-1">
+          <AccordionTrigger>Фильтры</AccordionTrigger>
+          <AccordionContent>
+            <Card className="pt-6 ld:max-w-[240px] h-fit">
+              <CardContent>
+                <Form {...form}>
+                  <form
+                    name="filterForm"
+                    id="filterForm"
+                    onSubmit={form.handleSubmit(onSubmit)}
+                    className="space-y-8">
+                    <div className="grid grid-cols-2">
+                      <FormLabel className="col-span-2 mb-3">Цена</FormLabel>
+                      <FormField
+                        control={form.control}
+                        name="minPrice"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormControl>
+                              <Input
+                                {...field}
+                                className="rounded-r-none content"
+                                type="number"
+                                placeholder="От"
+                                min={Math.floor(filters.minPrice)}
+                                max={Math.round(filters.maxPrice)}
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
                       />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="storage"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>
-                      Встроенная память <br /> {storage[0]}гб - {storage[1]}гб
-                    </FormLabel>
-                    <FormControl>
-                      <Slider2thumb
-                        onValueChange={(e) => {
-                          field.onChange(e), setStorage(e);
-                        }}
-                        value={field.value}
-                        min={filters.minStorage}
-                        max={filters.maxStorage}
-                        step={64}
+                      <FormField
+                        control={form.control}
+                        name="maxPrice"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormControl>
+                              <Input
+                                {...field}
+                                className="rounded-l-none"
+                                type="number"
+                                placeholder="До"
+                                min={Math.floor(filters.minPrice)}
+                                max={Math.round(filters.maxPrice)}
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
                       />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="size"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>
-                      Размер экрана <br /> {size[0]}&quot; - {size[1]}&quot;
-                    </FormLabel>
-                    <FormControl>
-                      <Slider2thumb
-                        onValueChange={(e) => {
-                          field.onChange(e), setSize(e);
-                        }}
-                        value={field.value}
-                        min={+filters.minSize}
-                        max={+filters.maxSize}
-                        step={1}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="weight"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>
-                      Вес <br /> {weight[0]}г - {weight[1]}г
-                    </FormLabel>
-                    <FormControl>
-                      <Slider2thumb
-                        onValueChange={(e) => {
-                          field.onChange(e), setWeight(e);
-                        }}
-                        value={field.value}
-                        min={+filters.minWeight}
-                        max={+filters.maxWeight}
-                        step={1}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </form>
-          </Form>
-        </CardContent>
-        <CardFooter>
-          <Button type="submit" form="filterForm" disabled={isPending}>
-            {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-            Применить
-          </Button>
-        </CardFooter>
-      </Card>
+                    </div>
+                    <FormField
+                      control={form.control}
+                      name="brand"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Бренды</FormLabel>
+                          <FormControl>
+                            <div
+                              onFocus={() => setBrandIsOpen(true)}
+                              onBlur={() => setBrandIsOpen(false)}>
+                              <MultipleSelector
+                                onChange={field.onChange}
+                                value={field.value}
+                                defaultOptions={brands}
+                                emptyIndicator={
+                                  <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">
+                                    no results found.
+                                  </p>
+                                }
+                              />
+                            </div>
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <div className={`transition-all ${brandIsOpen ? "h-64" : "h-0"} w-1`} />
+                    <FormField
+                      control={form.control}
+                      name="ram"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>
+                            Оперативная память <br /> {ram[0]}гб - {ram[1]}гб
+                          </FormLabel>
+                          <FormControl>
+                            <Slider2thumb
+                              onValueChange={(e) => {
+                                field.onChange(e), setRam(e);
+                              }}
+                              value={field.value}
+                              min={filters.minRam}
+                              max={filters.maxRam}
+                              step={1}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="storage"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>
+                            Встроенная память <br /> {storage[0]}гб - {storage[1]}гб
+                          </FormLabel>
+                          <FormControl>
+                            <Slider2thumb
+                              onValueChange={(e) => {
+                                field.onChange(e), setStorage(e);
+                              }}
+                              value={field.value}
+                              min={filters.minStorage}
+                              max={filters.maxStorage}
+                              step={64}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="size"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>
+                            Размер экрана <br /> {size[0]}&quot; - {size[1]}&quot;
+                          </FormLabel>
+                          <FormControl>
+                            <Slider2thumb
+                              onValueChange={(e) => {
+                                field.onChange(e), setSize(e);
+                              }}
+                              value={field.value}
+                              min={+filters.minSize}
+                              max={+filters.maxSize}
+                              step={1}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="weight"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>
+                            Вес <br /> {weight[0]}г - {weight[1]}г
+                          </FormLabel>
+                          <FormControl>
+                            <Slider2thumb
+                              onValueChange={(e) => {
+                                field.onChange(e), setWeight(e);
+                              }}
+                              value={field.value}
+                              min={+filters.minWeight}
+                              max={+filters.maxWeight}
+                              step={1}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </form>
+                </Form>
+              </CardContent>
+              <CardFooter>
+                <Button type="submit" form="filterForm" disabled={isPending}>
+                  {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                  Применить
+                </Button>
+              </CardFooter>
+            </Card>
+          </AccordionContent>
+        </AccordionItem>
+      </Accordion>
       <div className="grid gap-4 auto-rows-min grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
         {filteredProducts.length === 0 ? (
           <Suspense fallback={<div>Loading...</div>}>

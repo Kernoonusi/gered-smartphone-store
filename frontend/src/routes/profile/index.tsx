@@ -1,11 +1,10 @@
+import { ChangeProfileForm } from "@/components/profile/change-profile-form";
 import { useUserStore } from "@/components/stores/UserStore";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { orderService } from "@/services/order.service";
 import { userService } from "@/services/user.service";
-import { IUser } from "@/types";
 import { Await, createFileRoute, defer, Link, redirect, useNavigate } from "@tanstack/react-router";
-import ky from "ky";
 import { Loader2 } from "lucide-react";
 import { Suspense } from "react";
 
@@ -17,13 +16,9 @@ export const Route = createFileRoute("/profile/")({
   },
   loader: async () => {
     if (useUserStore.getState().name === "" && localStorage.getItem("jwt")) {
-      const user = await ky
-        .get("http://gered-store-back.lndo.site/users/me", {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("jwt")}`,
-          },
-        })
-        .json<IUser>();
+      const user = await userService.getUser();
+      console.log(user);
+      
       useUserStore.setState(user);
     }
     const orders = orderService.getOrders();
@@ -58,8 +53,10 @@ export function Index() {
         <CardContent className="flex flex-col gap-4">
           <p className="text-zinc-500">Ваше имя: {user.name}</p>
           <p className="text-zinc-500">Ваша почта: {user.email}</p>
+          {user.address && <p className="text-zinc-500">Ваш адрес: {user.address}</p>}
+          <ChangeProfileForm />
           {isAdmin && (
-            <Button className="w-fit">
+            <Button className="w-fit" variant={"outline"}>
               <Link to="/admin">Войти в админ панель</Link>
             </Button>
           )}
