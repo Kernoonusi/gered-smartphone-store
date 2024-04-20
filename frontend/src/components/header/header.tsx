@@ -103,7 +103,7 @@ export const Header = () => {
         <div className="w-screen overflow-hidden transition-all flex gap-4 md:gap-1 justify-center top-0 bg-fuchsia-900">
           <Link
             to="/"
-            className="md:anim-elem md:flex w-fit transition-all text-3xl p-2 h-full text-cyan-300">
+            className="anim-elem md:flex w-fit transition-all text-3xl p-2 h-full text-cyan-300">
             G
           </Link>
           <Link to="/products">
@@ -128,7 +128,7 @@ export const Header = () => {
               ))
             )}
           </div>
-          <div className="md:anim-elem md:ml-10 text-white">
+          <div className="anim-elem md:ml-10 text-white">
             <Link to="/cart">
               <Button variant="ghost" className="h-full rounded-none gap-4">
                 <p className="hidden md:block">Корзина</p>

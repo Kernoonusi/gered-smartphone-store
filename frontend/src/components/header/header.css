@@ -1,7 +1,9 @@
-.anim-elem {
-  animation: header-anim ease-in forwards;
-  animation-timeline: scroll(root);
-  animation-range: 0vh 15vh;
+@media (min-width: 768px) {
+  .anim-elem {
+    animation: header-anim ease-in forwards;
+    animation-timeline: scroll(root);
+    animation-range: 0vh 15vh;
+  }
 }
 
 @keyframes header-anim {
