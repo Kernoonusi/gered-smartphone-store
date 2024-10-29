@@ -2,7 +2,6 @@ import { Link } from "@tanstack/react-router";
 import { ShoppingCart } from "lucide-react";
 import { useEffect, useState } from "react";
 
-import { Input } from "@shadcnUi/input";
 import { Button } from "@shadcnUi/button";
 import "./header.css";
 import { Skeleton } from "@shadcnUi/skeleton";
@@ -86,7 +85,7 @@ export const Header = () => {
             <Link to="/" className="transition-all text-3xl p-2 h-full">
               Gered Store
             </Link>
-            <Input placeholder="Поиск..." className="h-full" />
+            <div/>
             <div>
               <Link to="/cart">
                 <Button variant="ghost" className="h-full gap-4">

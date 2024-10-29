@@ -7,14 +7,6 @@ use Firebase\JWT\Key;
 
 class Controller
 {
-    // private $requestMethod;
-    // private int|null $userId;
-    // private $tableGateway;
-    // private string $route;
-    // private array $routeActions;
-    // private array $formData;
-    // private array $requiredKeys;
-    // private array $headers;
     public function __construct(
         public \PDO $db,
         public string $requestMethod,

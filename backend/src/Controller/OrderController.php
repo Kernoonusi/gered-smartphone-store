@@ -58,15 +58,6 @@ class OrderController extends Controller
                     $response = call_user_func([$this, $this->routeActions[$this->route]]);
                 }
                 break;
-            // case 'PUT':
-            //     $response = $this->updateUserFromRequest($this->userId);
-            //     break;
-            // case 'DELETE':
-            //     $response = $this->deleteProduct($this->productId);
-            //     break;
-            // default:
-            //     $response = $this->notFoundResponse();
-            //     break;
         }
         http_response_code($response['status_code_header']);
         if (isset($response['body'])) {
