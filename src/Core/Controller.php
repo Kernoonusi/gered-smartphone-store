@@ -21,8 +21,8 @@ class Controller
     public function jwtEncode($data)
     {
         $payload = [
-            "iss" => "http://gered-store-back.lndo.site/",
-            "aud" => "http://gered-store-back.lndo.site/",
+            "iss" => "http://104.252.127.196",
+            "aud" => "http://104.252.127.196",
             "iat" => 1356999524,
             "nbf" => 1357000000,
             "data" => $data

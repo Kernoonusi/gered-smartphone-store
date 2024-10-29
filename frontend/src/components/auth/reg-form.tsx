@@ -43,7 +43,7 @@ export function RegForm() {
   const onSubmit = (values: z.infer<typeof formSchema>) => {
     startTransition(() => {
       console.log(values);
-      ky.post("http://gered-store-back.lndo.site/users/create", {
+      ky.post("http://104.252.127.196/api/users/create", {
         json: values,
       })
         .json<{ message?: string; jwt?: string; error?: string }>()

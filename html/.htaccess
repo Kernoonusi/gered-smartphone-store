@@ -1,0 +1,19 @@
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+
+  # Если запрос начинается с /api, перенаправляем на /api/index.php
+  RewriteCond %{REQUEST_URI} ^/api
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{REQUEST_FILENAME} !-d
+  RewriteRule ^api/?(.*)$ api/index.php [L,QSA]
+
+  # Исключаем запросы к фотографиям в папке api
+  RewriteCond %{REQUEST_URI} !^/api/smartphones/
+
+  # В других случаях перенаправляем на index.html
+  RewriteCond %{REQUEST_URI} !^/api
+  RewriteCond %{REQUEST_URI} !^/$
+  RewriteCond %{REQUEST_FILENAME} !-d
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteRule . index.html [L]
+</IfModule>

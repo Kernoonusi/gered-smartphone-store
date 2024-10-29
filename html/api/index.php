@@ -1,7 +1,7 @@
 <?php
 use Src\Router\Router;
 
-define('APP_PATH', dirname(__DIR__));
+define('APP_PATH', getenv('APP_PATH') ?: dirname(__DIR__));
 
 require APP_PATH . '/vendor/autoload.php';
 
@@ -22,12 +22,13 @@ header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers
 
 function getFormData($method)
 {
-
     // GET или POST: данные возвращаем как есть
-    if ($method === 'GET')
+    if ($method === 'GET') {
         return $_GET;
-    if ($method === 'POST')
+    }
+    if ($method === 'POST') {
         return $_POST;
+    }
 
     // PUT, PATCH или DELETE
     $data = array();
@@ -50,6 +51,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 $requestMethod = $_SERVER["REQUEST_METHOD"];
 $formData = getFormData($requestMethod);
 $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+
+// Удаляем префикс /api из URI, если он существует
+if (strpos($uri, '/api') === 0) {
+    $uri = substr($uri, 4); // Вырезаем '/api'
+}
+
 $headers = getallheaders();
 
 $router = new Router($dbConnection);

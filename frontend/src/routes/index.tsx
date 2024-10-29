@@ -11,7 +11,7 @@ export const Route = createFileRoute("/")({
   loader: async () => {
     if (useUserStore.getState().name === "" && localStorage.getItem("jwt")) {
       const user = await ky
-        .get("http://gered-store-back.lndo.site/users/me", {
+        .get("http://104.252.127.196/api/users/me", {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("jwt")}`,
           },
@@ -27,7 +27,7 @@ function Index() {
   const fetchData = async () => {
     try {
       const response: IProduct[] = await ky(
-        "http://gered-store-back.lndo.site/products?limit=5",
+        "http://104.252.127.196/api/products?limit=5",
       ).json();
       return response;
     } catch (error) {

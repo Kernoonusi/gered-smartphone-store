@@ -79,7 +79,6 @@ class UsersController extends Controller
         }
         $response['status_code_header'] = 200;
         $response['body'] = json_encode($result);
-        return $response;
     }
 
     private function getUser()

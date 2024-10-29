@@ -194,7 +194,7 @@ class ProductsController extends Controller
             return $this->unprocessableEntityResponse();
         }
         $images = $_FILES['images'];
-        $targetDirectory = APP_PATH . '/public/smartphones/';
+        $targetDirectory = APP_PATH . '/html/api/smartphones/';
         $view_of_image = ["", "2", "Front", "LeftSide", "RightSide", "Side", "UpSide"];
         $i = 0;
         foreach ($images['tmp_name'] as $key => $tmpName) {
@@ -240,7 +240,7 @@ class ProductsController extends Controller
         $id = $_POST["id"];
         if (!isset($_POST["nameProduct"]) && $_FILES['images']['tmp_name']) {
             $images = $_FILES['images'];
-            $targetDirectory = APP_PATH . '/public/smartphones/';
+            $targetDirectory = APP_PATH . '/html/api/smartphones/';
             $view_of_image = ["", "2", "Front", "LeftSide", "RightSide", "Side", "UpSide"];
             $product = $this->tableGateway->find($id);
             $i = 0;

@@ -13,7 +13,7 @@ export const useUserStore = create<IUser & UserStateAction>((set) => ({
   email: "",
   setUser: async () => {
     const user = await ky
-      .get("http://gered-store-back.lndo.site/users/me", {
+      .get("http://104.252.127.196/api/users/me", {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("jwt")}`,
         },
